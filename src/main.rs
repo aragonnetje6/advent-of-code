@@ -1,3 +1,5 @@
+mod p01;
+
 fn main() {
-    println!("Hello, world!");
+    p01::part_1_and_2()
 }
