@@ -108,26 +108,7 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(get_outcome(&(Move::Rock, Move::Paper)) as u32, 6);
-        assert_eq!(get_outcome(&(Move::Paper, Move::Rock)) as u32, 0);
-        assert_eq!(get_outcome(&(Move::Scissors, Move::Scissors)) as u32, 3);
-        assert_eq!(get_move_score(&(Move::Rock, Move::Paper)), 2);
-        assert_eq!(get_move_score(&(Move::Paper, Move::Rock)), 1);
-        assert_eq!(get_move_score(&(Move::Scissors, Move::Scissors)), 3);
         assert_eq!(part1("A Y\nB X\nC Z\n"), 15);
-        assert_eq!(part1("A X\n"), 3 + 1);
-        assert_eq!(part1("A Y\n"), 6 + 2);
-        assert_eq!(part1("A Z\n"), 0 + 3);
-        assert_eq!(part1("B X\n"), 0 + 1);
-        assert_eq!(part1("B Y\n"), 3 + 2);
-        assert_eq!(part1("B Z\n"), 6 + 3);
-        assert_eq!(part1("C X\n"), 6 + 1);
-        assert_eq!(part1("C Y\n"), 0 + 2);
-        assert_eq!(part1("C Z\n"), 3 + 3);
-        assert_eq!(
-            part1("A X\nA Y\nA Z\nB X\nB Y\nB Z\nC X\nC Y\nC Z\n"),
-            4 + 8 + 3 + 1 + 5 + 9 + 7 + 2 + 6
-        );
     }
     #[test]
     fn test_part2() {
