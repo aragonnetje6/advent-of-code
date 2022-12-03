@@ -11,6 +11,7 @@ fn main() {
     wrapper(2, 1, p02::part1);
     wrapper(2, 2, p02::part2);
     wrapper(3, 1, p03::part1);
+    wrapper(3, 2, p03::part2);
 }
 
 fn wrapper<F: FnOnce(&str) -> T, T: Display>(index: u32, part: u32, func: F) {
