@@ -115,7 +115,6 @@ mod test {
         assert_eq!(get_move_score(&(Move::Paper, Move::Rock)), 1);
         assert_eq!(get_move_score(&(Move::Scissors, Move::Scissors)), 3);
         assert_eq!(part1("A Y\nB X\nC Z\n"), 15);
-        dbg!(process_input("A X\n"));
         assert_eq!(part1("A X\n"), 3 + 1);
         assert_eq!(part1("A Y\n"), 6 + 2);
         assert_eq!(part1("A Z\n"), 0 + 3);
