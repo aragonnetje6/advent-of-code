@@ -19,5 +19,5 @@ fn main() {
     wrapper(2021, 5, 1, p05::part1);
     wrapper(2021, 5, 2, p05::part2);
     wrapper(2021, 6, 1, p06::part1);
-    // wrapper(2021, 6, 2, p06::part2);
+    wrapper(2021, 6, 2, p06::part2);
 }
