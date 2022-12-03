@@ -55,3 +55,24 @@ fn parse_commands(input: &str) -> Vec<Command> {
         })
         .collect()
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_part1() {
+        assert_eq!(
+            part1("forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n"),
+            150
+        )
+    }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(
+            part2("forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n"),
+            900
+        )
+    }
+}
