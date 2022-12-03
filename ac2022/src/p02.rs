@@ -1,14 +1,14 @@
 type Recommendation = (Move, Move);
 type Recommendation2 = (Move, Outcome);
 
-#[derive(Eq, PartialEq, Clone, Debug)]
+#[derive(Eq, PartialEq, Clone, Copy, Debug)]
 enum Move {
     Rock,
     Paper,
     Scissors,
 }
 
-#[derive(Eq, PartialEq, Clone, Debug)]
+#[derive(Eq, PartialEq, Clone, Copy, Debug)]
 enum Outcome {
     Win,
     Draw,
@@ -28,14 +28,13 @@ pub fn part2(input: &str) -> u32 {
         .map(translate)
         .map(|recommend| get_move_score(&recommend) + get_outcome_score(&get_outcome(&recommend)))
         .sum()
-
 }
 
 fn translate(rec: &Recommendation2) -> Recommendation {
     match rec.1 {
-        Outcome::Win => (rec.0.clone(), defeats(&rec.0)),
-        Outcome::Draw => (rec.0.clone(), rec.0.clone()),
-        Outcome::Loss => (rec.0.clone(), defeated_by(&rec.0))
+        Outcome::Win => (rec.0, defeats(&rec.0)),
+        Outcome::Draw => (rec.0, rec.0),
+        Outcome::Loss => (rec.0, defeated_by(&rec.0)),
     }
 }
 
@@ -95,7 +94,7 @@ fn process_input(input: &str) -> Vec<Recommendation> {
                 .collect::<Vec<Move>>()
         })
         .filter(|x| !x.is_empty())
-        .map(|v| (v[0].clone(), v[1].clone()))
+        .map(|v| (v[0], v[1]))
         .collect::<Vec<Recommendation>>()
 }
 
@@ -104,7 +103,7 @@ fn process_input_2(input: &str) -> Vec<Recommendation2> {
         .iter()
         .map(|(mov1, mov2)| {
             (
-                mov1.clone(),
+                *mov1,
                 match mov2 {
                     Move::Rock => Outcome::Loss,
                     Move::Paper => Outcome::Draw,
@@ -121,9 +120,18 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(get_outcome_score(&get_outcome(&(Move::Rock, Move::Paper))), 6);
-        assert_eq!(get_outcome_score(&get_outcome(&(Move::Paper, Move::Rock))), 0);
-        assert_eq!(get_outcome_score(&get_outcome(&(Move::Scissors, Move::Scissors))), 3);
+        assert_eq!(
+            get_outcome_score(&get_outcome(&(Move::Rock, Move::Paper))),
+            6
+        );
+        assert_eq!(
+            get_outcome_score(&get_outcome(&(Move::Paper, Move::Rock))),
+            0
+        );
+        assert_eq!(
+            get_outcome_score(&get_outcome(&(Move::Scissors, Move::Scissors))),
+            3
+        );
         assert_eq!(get_move_score(&(Move::Rock, Move::Paper)), 2);
         assert_eq!(get_move_score(&(Move::Paper, Move::Rock)), 1);
         assert_eq!(get_move_score(&(Move::Scissors, Move::Scissors)), 3);
