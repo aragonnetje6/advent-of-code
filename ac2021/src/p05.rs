@@ -1,4 +1,4 @@
-use std::cmp::{max, min};
+use std::cmp::{max, max_by_key, min, min_by_key};
 use std::str::FromStr;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -62,7 +62,19 @@ impl Line {
                 .map(|x| Point { y: self.start.y, x })
                 .collect()
         } else {
-            todo!()
+            let lower = min_by_key(self.start, self.end, |point| point.x);
+            let higher = max_by_key(self.start, self.end, |point| point.x);
+            if lower.y < higher.y {
+                (lower.x..=higher.x)
+                    .zip(lower.y..=higher.y)
+                    .map(|(x, y)| Point { x, y })
+                    .collect()
+            } else {
+                (lower.x..=higher.x)
+                    .zip((higher.y..=lower.y).rev())
+                    .map(|(x, y)| Point { x, y })
+                    .collect()
+            }
         }
     }
 }
@@ -73,9 +85,9 @@ struct Seabed {
 }
 
 impl Seabed {
-    fn new(lines: &Vec<&Line>) -> Self {
+    fn new(lines: &Vec<Line>) -> Self {
         let size: usize = lines.iter().map(|x| x.max_coord()).max().unwrap();
-        let mut field = vec![vec![0; size+1]; size+1];
+        let mut field = vec![vec![0; size + 1]; size + 1];
         for line in lines {
             line.get_points()
                 .iter()
@@ -85,7 +97,10 @@ impl Seabed {
     }
 
     fn get_greater_than(&self, n: u32) -> u32 {
-        self.field.iter().map(|line| line.iter().filter(|x| **x > n).count() as u32).sum()
+        self.field
+            .iter()
+            .map(|line| line.iter().filter(|x| **x > n).count() as u32)
+            .sum()
     }
 }
 
@@ -98,13 +113,15 @@ fn process_input(input: &str) -> Vec<Line> {
 
 pub fn part1(input: &str) -> u32 {
     let data = process_input(input);
-    let straight_data = data.iter().filter(|x| x.straight()).collect();
+    let straight_data = data.iter().filter(|x| x.straight()).cloned().collect();
     let seabed = Seabed::new(&straight_data);
     seabed.get_greater_than(1)
 }
 
 pub fn part2(input: &str) -> u32 {
-    todo!();
+    let data = process_input(input);
+    let seabed = Seabed::new(&data);
+    seabed.get_greater_than(1)
 }
 
 #[cfg(test)]
@@ -128,7 +145,6 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
         assert_eq!(part2(DATA), 12)
     }
