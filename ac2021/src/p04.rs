@@ -21,7 +21,10 @@ impl FromStr for Bingo {
                 board[i][j] = data.next().unwrap();
             }
         }
-        Ok(Self { board, checked: [[false; 5]; 5] })
+        Ok(Self {
+            board,
+            checked: [[false; 5]; 5],
+        })
     }
 }
 
@@ -91,7 +94,11 @@ pub fn part2(input: &str) -> u32 {
         let num = *nums_iter.next().unwrap();
         bingos.iter_mut().for_each(|bingo| bingo.check(num));
     }
-    let mut last = bingos.iter().find(|bingo| !bingo.has_won()).unwrap().clone();
+    let mut last = bingos
+        .iter()
+        .find(|bingo| !bingo.has_won())
+        .unwrap()
+        .clone();
     for num in nums_iter {
         last.check(*num);
         if last.has_won() {
