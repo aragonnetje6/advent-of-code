@@ -25,3 +25,24 @@ pub fn part2(input: &str) -> usize {
         .count();
     increases
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_part1() {
+        assert_eq!(
+            part1("199\n200\n208\n210\n200\n207\n240\n269\n260\n263\n"),
+            7
+        )
+    }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(
+            part2("199\n200\n208\n210\n200\n207\n240\n269\n260\n263\n"),
+            5
+        )
+    }
+}
