@@ -3,22 +3,22 @@ type Recommendation2 = (Move, Outcome);
 
 #[derive(Eq, PartialEq, Clone, Copy, Debug)]
 enum Move {
-    Rock,
-    Paper,
-    Scissors,
+    Rock = 1,
+    Paper = 2,
+    Scissors = 3,
 }
 
 #[derive(Eq, PartialEq, Clone, Copy, Debug)]
 enum Outcome {
-    Win,
-    Draw,
-    Loss,
+    Win = 6,
+    Draw = 3,
+    Loss = 0,
 }
 
 pub fn part1(input: &str) -> u32 {
     let data = process_input(input);
     data.iter()
-        .map(|recommend| get_move_score(recommend) + get_outcome_score(&get_outcome(recommend)))
+        .map(|recommend| get_move_score(recommend) + get_outcome(recommend) as u32)
         .sum()
 }
 
@@ -26,7 +26,7 @@ pub fn part2(input: &str) -> u32 {
     let data = process_input_2(input);
     data.iter()
         .map(translate)
-        .map(|recommend| get_move_score(&recommend) + get_outcome_score(&get_outcome(&recommend)))
+        .map(|recommend| -> u32 { get_move_score(&recommend) + get_outcome(&recommend) as u32 })
         .sum()
 }
 
@@ -39,11 +39,7 @@ fn translate(rec: &Recommendation2) -> Recommendation {
 }
 
 const fn get_move_score(rec: &Recommendation) -> u32 {
-    match rec.1 {
-        Move::Rock => 1,
-        Move::Paper => 2,
-        Move::Scissors => 3,
-    }
+    rec.1 as u32
 }
 
 const fn defeats(x: &Move) -> Move {
@@ -72,17 +68,9 @@ fn get_outcome(rec: &Recommendation) -> Outcome {
     }
 }
 
-const fn get_outcome_score(outcome: &Outcome) -> u32 {
-    match outcome {
-        Outcome::Win => 6,
-        Outcome::Draw => 3,
-        Outcome::Loss => 0,
-    }
-}
-
 fn process_input(input: &str) -> Vec<Recommendation> {
     input
-        .split('\n')
+        .lines()
         .map(|line| {
             line.split(' ')
                 .filter_map(|char| match char {
@@ -120,18 +108,9 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(
-            get_outcome_score(&get_outcome(&(Move::Rock, Move::Paper))),
-            6
-        );
-        assert_eq!(
-            get_outcome_score(&get_outcome(&(Move::Paper, Move::Rock))),
-            0
-        );
-        assert_eq!(
-            get_outcome_score(&get_outcome(&(Move::Scissors, Move::Scissors))),
-            3
-        );
+        assert_eq!(get_outcome(&(Move::Rock, Move::Paper)) as u32, 6);
+        assert_eq!(get_outcome(&(Move::Paper, Move::Rock)) as u32, 0);
+        assert_eq!(get_outcome(&(Move::Scissors, Move::Scissors)) as u32, 3);
         assert_eq!(get_move_score(&(Move::Rock, Move::Paper)), 2);
         assert_eq!(get_move_score(&(Move::Paper, Move::Rock)), 1);
         assert_eq!(get_move_score(&(Move::Scissors, Move::Scissors)), 3);
