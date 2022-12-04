@@ -18,31 +18,31 @@ enum Outcome {
 pub fn part1(input: &str) -> u32 {
     let data = process_input(input);
     data.iter()
-        .map(|recommend| get_move_score(recommend) + get_outcome(recommend) as u32)
+        .map(|recommend| get_move_score(*recommend) + get_outcome(*recommend) as u32)
         .sum()
 }
 
 pub fn part2(input: &str) -> u32 {
     let data = process_input_2(input);
     data.iter()
-        .map(translate)
-        .map(|recommend| -> u32 { get_move_score(&recommend) + get_outcome(&recommend) as u32 })
+        .map(|x| translate(*x))
+        .map(|recommend| -> u32 { get_move_score(recommend) + get_outcome(recommend) as u32 })
         .sum()
 }
 
-fn translate(rec: &Recommendation2) -> Recommendation {
+fn translate(rec: Recommendation2) -> Recommendation {
     match rec.1 {
-        Outcome::Win => (rec.0, defeats(&rec.0)),
+        Outcome::Win => (rec.0, defeats(rec.0)),
         Outcome::Draw => (rec.0, rec.0),
-        Outcome::Loss => (rec.0, defeated_by(&rec.0)),
+        Outcome::Loss => (rec.0, defeated_by(rec.0)),
     }
 }
 
-const fn get_move_score(rec: &Recommendation) -> u32 {
+const fn get_move_score(rec: Recommendation) -> u32 {
     rec.1 as u32
 }
 
-const fn defeats(x: &Move) -> Move {
+const fn defeats(x: Move) -> Move {
     match x {
         Move::Rock => Move::Paper,
         Move::Paper => Move::Scissors,
@@ -50,7 +50,7 @@ const fn defeats(x: &Move) -> Move {
     }
 }
 
-const fn defeated_by(x: &Move) -> Move {
+const fn defeated_by(x: Move) -> Move {
     match x {
         Move::Rock => Move::Scissors,
         Move::Paper => Move::Rock,
@@ -58,10 +58,10 @@ const fn defeated_by(x: &Move) -> Move {
     }
 }
 
-fn get_outcome(rec: &Recommendation) -> Outcome {
+fn get_outcome(rec: Recommendation) -> Outcome {
     if rec.0 == rec.1 {
         Outcome::Draw
-    } else if rec.1 == defeats(&rec.0) {
+    } else if rec.1 == defeats(rec.0) {
         Outcome::Win
     } else {
         Outcome::Loss

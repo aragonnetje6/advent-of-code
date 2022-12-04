@@ -16,7 +16,7 @@ fn process_input(input: &str) -> Vec<u32> {
 
 pub fn part2(input: &str) -> u32 {
     let mut sums: Vec<u32> = process_input(input);
-    sums.sort();
+    sums.sort_unstable();
     sums.iter().rev().take(3).sum()
 }
 

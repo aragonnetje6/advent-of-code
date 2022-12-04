@@ -5,16 +5,18 @@ use std::str::FromStr;
 #[derive(Clone, Copy, Eq, PartialEq, Hash)]
 struct Item {
     letter: char,
-    score: u32,
+    score: usize,
 }
 
 impl Item {
     fn new(c: char) -> Self {
         Self {
             letter: c,
-            score: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            score: ('a'..='z')
+                .chain('A'..='Z')
+                .collect::<String>()
                 .find(c)
-                .unwrap() as u32
+                .unwrap() as usize
                 + 1,
         }
     }
@@ -29,12 +31,12 @@ impl FromStr for Rucksack {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self::new(s.chars().map(Item::new).collect()))
+        Ok(Self::new(&s.chars().map(Item::new).collect::<Vec<Item>>()))
     }
 }
 
 impl Rucksack {
-    fn new(contents: Vec<Item>) -> Self {
+    fn new(contents: &[Item]) -> Self {
         let (compartment_1, compartment_2) = contents.split_at(contents.len() / 2);
         Self {
             compartment_1: compartment_1.to_vec(),
@@ -60,7 +62,7 @@ fn process_input(input: &str) -> Vec<Rucksack> {
         .collect()
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> usize {
     let data = process_input(input);
     data.iter()
         .map(|rucksack| rucksack.get_duplicate().score)
@@ -69,14 +71,23 @@ pub fn part1(input: &str) -> u32 {
 
 fn find_common_item(sack1: &Rucksack, sack2: &Rucksack, sack3: &Rucksack) -> Item {
     let set1: HashSet<Item, RandomState> = HashSet::from_iter(sack1.total());
-    let intersect12: HashSet<Item> = set1.intersection(&HashSet::from_iter(sack2.total())).copied().collect();
-    intersect12.intersection(&HashSet::from_iter(sack3.total())).copied().next().unwrap()
+    let intersect12: HashSet<Item> = set1
+        .intersection(&HashSet::from_iter(sack2.total()))
+        .copied()
+        .collect();
+    intersect12
+        .intersection(&HashSet::from_iter(sack3.total()))
+        .copied()
+        .next()
+        .unwrap()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> usize {
     let data = process_input(input);
-    data.iter().enumerate().step_by(3)
-        .map(|(i, rucksack)| find_common_item(rucksack, &data[i+1], &data[i+2]).score)
+    data.iter()
+        .enumerate()
+        .step_by(3)
+        .map(|(i, rucksack)| find_common_item(rucksack, &data[i + 1], &data[i + 2]).score)
         .sum()
 }
 
