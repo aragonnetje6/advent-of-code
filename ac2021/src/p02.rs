@@ -29,7 +29,7 @@ pub fn part2(input: &str) -> u128 {
         match command {
             Forward(x) => {
                 pos += x;
-                depth += aim * x
+                depth += aim * x;
             }
             Down(x) => aim += x,
             Up(x) => aim -= x,
@@ -65,7 +65,7 @@ mod test {
         assert_eq!(
             part1("forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n"),
             150
-        )
+        );
     }
 
     #[test]
@@ -73,6 +73,6 @@ mod test {
         assert_eq!(
             part2("forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n"),
             900
-        )
+        );
     }
 }

@@ -86,7 +86,7 @@ struct Seabed {
 
 impl Seabed {
     fn new(lines: &Vec<Line>) -> Self {
-        let size: usize = lines.iter().map(|x| x.max_coord()).max().unwrap();
+        let size: usize = lines.iter().map(Line::max_coord).max().unwrap();
         let mut field = vec![vec![0; size + 1]; size + 1];
         for line in lines {
             line.get_points()
@@ -96,10 +96,10 @@ impl Seabed {
         Self { field }
     }
 
-    fn get_greater_than(&self, n: u32) -> u32 {
+    fn get_greater_than(&self, n: u32) -> usize {
         self.field
             .iter()
-            .map(|line| line.iter().filter(|x| **x > n).count() as u32)
+            .map(|line| line.iter().filter(|x| **x > n).count() as usize)
             .sum()
     }
 }
@@ -111,14 +111,14 @@ fn process_input(input: &str) -> Vec<Line> {
         .collect()
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> usize {
     let data = process_input(input);
     let straight_data = data.iter().filter(|x| x.straight()).cloned().collect();
     let seabed = Seabed::new(&straight_data);
     seabed.get_greater_than(1)
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> usize {
     let data = process_input(input);
     let seabed = Seabed::new(&data);
     seabed.get_greater_than(1)
@@ -141,11 +141,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 5)
+        assert_eq!(part1(DATA), 5);
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 12)
+        assert_eq!(part2(DATA), 12);
     }
 }

@@ -10,7 +10,7 @@ pub fn part1(input: &str) -> u32 {
             } else {
                 occurences[i] -= 1;
             }
-        })
+        });
     });
     let epsilon = u32::from_str_radix(
         &occurences
@@ -74,13 +74,13 @@ mod test {
     fn test_part1() {
         assert_eq!(part1(
             "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010\n"
-        ), 198)
+        ), 198);
     }
 
     #[test]
     fn test_part2() {
         assert_eq!(part2(
             "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010\n"
-        ), 230)
+        ), 230);
     }
 }

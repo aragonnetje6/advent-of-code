@@ -56,11 +56,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 37)
+        assert_eq!(part1(DATA), 37);
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 168)
+        assert_eq!(part2(DATA), 168);
     }
 }

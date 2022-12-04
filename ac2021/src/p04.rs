@@ -56,7 +56,7 @@ impl Bingo {
         for i in 0..self.board.len() {
             for j in 0..self.board[0].len() {
                 if !self.checked[i][j] {
-                    total += self.board[i][j] as u32;
+                    total += u32::from(self.board[i][j]);
                 }
             }
         }
@@ -81,7 +81,7 @@ pub fn part1(input: &str) -> u32 {
     for num in nums {
         bingos.iter_mut().for_each(|bingo| bingo.check(num));
         if let Some(winner) = bingos.iter().find(|x| x.has_won()) {
-            return winner.score() * num as u32;
+            return winner.score() * u32::from(num);
         }
     }
     unreachable!()
@@ -102,7 +102,7 @@ pub fn part2(input: &str) -> u32 {
     for num in nums_iter {
         last.check(*num);
         if last.has_won() {
-            return last.score() * *num as u32;
+            return last.score() * u32::from(*num);
         }
     }
     unreachable!()
@@ -134,11 +134,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 4512)
+        assert_eq!(part1(DATA), 4512);
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 1924)
+        assert_eq!(part2(DATA), 1924);
     }
 }
