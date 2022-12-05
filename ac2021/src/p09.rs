@@ -44,7 +44,7 @@ fn list_low_points(map: &Vec<Vec<u32>>) -> Vec<(usize, usize)> {
 
 pub fn part1(input: &str) -> u32 {
     let map = parse_heightmap(input);
-    dbg!(list_low_points(&map)).iter().map(|(x,y)| map[*x][*y] + 1).sum()
+    list_low_points(&map).iter().map(|(x,y)| map[*x][*y] + 1).sum()
 }
 
 pub fn part2(input: &str) -> u32 {
