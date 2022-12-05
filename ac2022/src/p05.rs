@@ -9,8 +9,34 @@ use nom::IResult;
 
 #[derive(Copy, Clone, Debug)]
 enum Element {
-    Present(char),
-    Empty,
+Present(char),
+Empty,
+}
+
+#[derive(Copy, Clone, Debug)]
+struct Move {
+    amt: u32,
+    from: usize,
+    to: usize,
+}
+
+impl Move {
+    fn execute<T>(&self, stack: &mut [Vec<T>]) {
+        for _ in 0..self.amt {
+            let elem = stack[self.from - 1].pop().unwrap();
+            stack[self.to - 1].push(elem);
+        }
+    }
+
+    fn execute_9001<T>(&self, stack: &mut [Vec<T>]) {
+        let mut intermediate = vec![];
+        for _ in 0..self.amt {
+            intermediate.push(stack[self.from - 1].pop().unwrap());
+        }
+        for _ in 0..self.amt {
+            stack[self.to - 1].push(intermediate.pop().unwrap());
+        }
+    }
 }
 
 fn present_element(input: &str) -> IResult<&str, Element> {
@@ -45,12 +71,12 @@ fn index_row(input: &str) -> IResult<&str, Vec<u8>> {
 
 fn transpose<T: Copy>(original: &Vec<Vec<T>>) -> Vec<Vec<T>> {
     (0..original[0].len())
-        .map(|index2| {
+    .map(|index2| {
             (0..original.len())
-                .map(|index1| original[index1][index2])
-                .collect()
+            .map(|index1| original[index1][index2])
+            .collect()
         })
-        .collect()
+    .collect()
 }
 
 fn stack(input: &str) -> IResult<&str, Vec<Vec<char>>> {
@@ -60,46 +86,20 @@ fn stack(input: &str) -> IResult<&str, Vec<Vec<char>>> {
     stack.reverse();
     let stack = transpose(&stack);
     let stack = stack
-        .iter()
-        .map(|line| {
+    .iter()
+    .map(|line| {
             line.iter()
-                .filter_map(|elem| match *elem {
-                    Element::Present(x) => Some(x),
-                    Element::Empty => None,
+            .filter_map(|elem| match *elem {
+                        Element::Present(x) => Some(x),
+                        Element::Empty => None,
                 })
-                .collect()
+            .collect()
         })
-        .collect();
+    .collect();
     Ok((input, stack))
 }
 
-#[derive(Copy, Clone, Debug)]
-struct Move {
-    amt: u32,
-    from: usize,
-    to: usize,
-}
-
-impl Move {
-    fn execute<T>(&self, stack: &mut [Vec<T>]) {
-        for _ in 0..self.amt {
-            let elem = stack[self.from - 1].pop().unwrap();
-            stack[self.to - 1].push(elem);
-        }
-    }
-
-    fn execute_9001<T>(&self, stack: &mut [Vec<T>]) {
-        let mut intermediate = vec![];
-        for _ in 0..self.amt {
-            intermediate.push(stack[self.from - 1].pop().unwrap());
-        }
-        for _ in 0..self.amt {
-            stack[self.to - 1].push(intermediate.pop().unwrap());
-        }
-    }
-}
-
-fn order(input: &str) -> IResult<&str, Move> {
+fn instruction(input: &str) -> IResult<&str, Move> {
     let (input, _) = tag("move ")(input)?;
     let (input, amt) = map_res(digit1, str::parse)(input)?;
     let (input, _) = tag(" from ")(input)?;
@@ -109,14 +109,14 @@ fn order(input: &str) -> IResult<&str, Move> {
     Ok((input, Move { amt, from, to }))
 }
 
-fn orders(input: &str) -> IResult<&str, Vec<Move>> {
-    separated_list1(tag("\n"), order)(input)
+fn instructions(input: &str) -> IResult<&str, Vec<Move>> {
+    separated_list1(tag("\n"), instruction)(input)
 }
 
 fn parse_all(input: &str) -> IResult<&str, (Vec<Vec<char>>, Vec<Move>)> {
     let (input, stack) = stack(input)?;
     let (input, _) = tag("\n\n")(input)?;
-    let (input, orders) = orders(input)?;
+    let (input, orders) = instructions(input)?;
     Ok((input, (stack, orders)))
 }
 
