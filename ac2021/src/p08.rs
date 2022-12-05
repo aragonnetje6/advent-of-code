@@ -92,15 +92,21 @@ fn charmap_to_num(candidate: &HashMap<char, u8>, num: &str) -> Option<u8> {
 
 fn counting_reduce(possibilities: &mut HashMap<char, HashSet<u8>>, input: &[&str]) {
     for c in 'a'..='g' {
-        let count: usize = input.iter().map(|x| x.chars().filter(|y| *y == c).count()).sum();
-        possibilities.get_mut(&c).unwrap().retain(|x| match count {
-            4 => vec![4],
-            6 => vec![1],
-            7 => vec![3, 6],
-            8 => vec![0, 2],
-            9 => vec![5],
-            _ => unreachable!()
-        }.contains(x));
+        let count: usize = input
+            .iter()
+            .map(|x| x.chars().filter(|y| *y == c).count())
+            .sum();
+        possibilities.get_mut(&c).unwrap().retain(|x| {
+            match count {
+                4 => vec![4],
+                6 => vec![1],
+                7 => vec![3, 6],
+                8 => vec![0, 2],
+                9 => vec![5],
+                _ => unreachable!(),
+            }
+            .contains(x)
+        });
     }
 }
 
@@ -110,11 +116,15 @@ fn dedup(possibilities: &mut HashMap<char, HashSet<u8>>) {
         changed = false;
         for c in 'a'..='g' {
             if possibilities.get(&c).unwrap().len() > 1 {
-                continue
+                continue;
             }
             let options = possibilities.get(&c).unwrap().clone();
             for c2 in ('a'..='g').filter(|x| x != &c) {
-                if possibilities.get_mut(&c2).unwrap().remove(options.iter().next().unwrap()) {
+                if possibilities
+                    .get_mut(&c2)
+                    .unwrap()
+                    .remove(options.iter().next().unwrap())
+                {
                     changed = true;
                 }
             }
@@ -126,8 +136,10 @@ fn decode(input: &[&str], output: &[&str]) -> u32 {
     let mut possibilities = get_possibilities(input, output);
     counting_reduce(&mut possibilities, input);
     dedup(&mut possibilities);
-    let mapping = possibilities.iter().map(|(c, set)| (*c, *set.iter().next().unwrap())).collect();
-    // let mapping = backtrack(&dbg!(possibilities), input, output).unwrap();
+    let mapping = possibilities
+        .iter()
+        .map(|(c, set)| (*c, *set.iter().next().unwrap()))
+        .collect();
     output
         .iter()
         .map(|digit| charmap_to_num(&mapping, digit).unwrap().to_string())
