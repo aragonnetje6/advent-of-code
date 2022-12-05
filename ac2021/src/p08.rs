@@ -87,73 +87,47 @@ fn charmap_to_num(candidate: &HashMap<char, u8>, num: &str) -> Option<u8> {
         .map(|c| candidate.get(&c).unwrap())
         .copied()
         .collect();
-    dbg!((0..10).find(|&i| segments(i).eq(dbg!(&decoded))))
+    (0..10).find(|&i| segments(i).eq(&decoded))
 }
 
-fn check(candidate: &HashMap<char, u8>, input: &[&str], output: &[&str]) -> bool {
-    let all_nums: HashSet<u8> = (0..=9).collect::<HashSet<_>>();
-    let Some(input_nums) = input.iter().map(|num| charmap_to_num(candidate, num)).collect() else {
-        return false;
-    };
-    if all_nums.eq(&input_nums) {
-        return false;
+fn counting_reduce(possibilities: &mut HashMap<char, HashSet<u8>>, input: &[&str]) {
+    for c in 'a'..='g' {
+        let count: usize = input.iter().map(|x| x.chars().filter(|y| *y == c).count()).sum();
+        possibilities.get_mut(&c).unwrap().retain(|x| match count {
+            4 => vec![4],
+            6 => vec![1],
+            7 => vec![3, 6],
+            8 => vec![0, 2],
+            9 => vec![5],
+            _ => unreachable!()
+        }.contains(x));
     }
-    let Some(output_nums) = output.iter().map(|num| charmap_to_num(candidate, num)).collect() else {
-        return false;
-    };
-    all_nums.is_superset(&output_nums)
 }
 
-fn quick_check(assumptions: &HashMap<char, HashSet<u8>>) -> bool {
-    assumptions.iter().any(|(c, set)| {
-        set.len() == 1
-            && assumptions
-                .iter()
-                .any(|(c2, set2)| c != c2 && set2.is_superset(set))
-    })
-}
-
-fn backtrack(
-    assumptions: &HashMap<char, HashSet<u8>>,
-    input: &[&str],
-    output: &[&str],
-) -> Result<HashMap<char, u8>, &'static str> {
-    for (c, options) in assumptions.iter() {
-        if options.len() == 1 {
-            continue;
-        }
-        for opt in options {
-            let mut new_assumptions = assumptions.clone();
-            new_assumptions.insert(*c, HashSet::from_iter(vec![*opt]));
-            if !quick_check(&new_assumptions) {
-                continue;
+fn dedup(possibilities: &mut HashMap<char, HashSet<u8>>) {
+    let mut changed = true;
+    while changed {
+        changed = false;
+        for c in 'a'..='g' {
+            if possibilities.get(&c).unwrap().len() > 1 {
+                continue
             }
-            match backtrack(&new_assumptions, input, output) {
-                Ok(x) => return Ok(x),
-                Err(_) => continue,
+            let options = possibilities.get(&c).unwrap().clone();
+            for c2 in ('a'..='g').filter(|x| x != &c) {
+                if possibilities.get_mut(&c2).unwrap().remove(options.iter().next().unwrap()) {
+                    changed = true;
+                }
             }
         }
-    }
-    if !quick_check(assumptions){
-        return Err("impossible");
-    }
-    if assumptions.iter().any(|(_, opts)| opts.len() > 1) {
-        return Err("Inconclusive")
-    }
-    let candidate = assumptions
-        .iter()
-        .map(|(c, o)| (*c, *o.iter().next().unwrap()))
-        .collect();
-    if dbg!(check(dbg!(&candidate), input, output)) {
-        Ok(candidate)
-    } else {
-        Err("Impossible")
     }
 }
 
 fn decode(input: &[&str], output: &[&str]) -> u32 {
-    let possibilities = get_possibilities(input, output);
-    let mapping = backtrack(&possibilities, input, output).unwrap();
+    let mut possibilities = get_possibilities(input, output);
+    counting_reduce(&mut possibilities, input);
+    dedup(&mut possibilities);
+    let mapping = possibilities.iter().map(|(c, set)| (*c, *set.iter().next().unwrap())).collect();
+    // let mapping = backtrack(&dbg!(possibilities), input, output).unwrap();
     output
         .iter()
         .map(|digit| charmap_to_num(&mapping, digit).unwrap().to_string())
@@ -163,9 +137,7 @@ fn decode(input: &[&str], output: &[&str]) -> u32 {
 }
 
 pub fn part2(input: &str) -> u32 {
-    println!("running");
     let data = parse_input(input);
-    println!("{data:?}");
     data.iter()
         .map(|(input, output)| decode(input, output))
         .sum()
@@ -199,13 +171,11 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
     }
 
     #[test]
-    #[ignore]
     fn test_part2_small() {
         assert_eq!(part2(DATA2), 5353);
     }
 
     #[test]
-    #[ignore]
     fn test_part2_big() {
         assert_eq!(part2(DATA1), 61229);
     }
