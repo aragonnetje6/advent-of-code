@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 lib = { path = "./../lib" }
-bytecount = "*"
+bytecount = "^0.6.3"
+nom = "7.1.1"
