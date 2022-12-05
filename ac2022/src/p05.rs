@@ -87,6 +87,16 @@ impl Move {
             stack[self.to - 1].push(elem);
         }
     }
+
+    fn execute_9001<T>(&self, stack: &mut [Vec<T>]) {
+        let mut intermediate = vec![];
+        for _ in 0..self.amt {
+            intermediate.push(stack[self.from - 1].pop().unwrap());
+        }
+        for _ in 0..self.amt {
+            stack[self.to - 1].push(intermediate.pop().unwrap());
+        }
+    }
 }
 
 fn order(input: &str) -> IResult<&str, Move> {
@@ -117,7 +127,11 @@ pub fn part1(input: &str) -> String {
 }
 
 pub fn part2(input: &str) -> String {
-    todo!();
+    let (_, (mut stack, orders)) = parse_all(input).unwrap();
+    orders
+        .iter()
+        .for_each(|order| order.execute_9001(&mut stack));
+    stack.iter().map(|line| line.last().unwrap()).collect()
 }
 
 #[cfg(test)]
@@ -140,8 +154,7 @@ move 1 from 1 to 2
         assert_eq!(part1(DATA), "CMZ");
     }
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA), "");
+        assert_eq!(part2(DATA), "MCD");
     }
 }
