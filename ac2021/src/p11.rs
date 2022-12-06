@@ -72,7 +72,7 @@ pub fn part1(input: &str) -> usize {
 
 pub fn part2(input: &str) -> u32 {
     let mut data = parse(input);
-    (0..).find(|_| step(&mut data) == data.len() * data[0].len()).unwrap() + 1
+    (0..1000).find(|_| step(&mut data) == data.len() * data[0].len()).unwrap() + 1
 }
 
 #[cfg(test)]
