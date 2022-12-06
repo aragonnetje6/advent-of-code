@@ -1,3 +1,5 @@
+use std::collections::{HashSet, VecDeque};
+
 fn parse_heightmap(input: &str) -> Vec<Vec<u32>> {
     input
         .lines()
@@ -37,18 +39,54 @@ fn list_low_points(map: &Vec<Vec<u32>>) -> Vec<(usize, usize)> {
                         .iter()
                         .all(|(x2, y2)| map[*x2][*y2] > **height)
                 })
-                .map(|(y, _)| (x, y)).collect::<Vec<_>>()
+                .map(|(y, _)| (x, y))
+                .collect::<Vec<_>>()
         })
         .collect()
 }
 
 pub fn part1(input: &str) -> u32 {
     let map = parse_heightmap(input);
-    list_low_points(&map).iter().map(|(x,y)| map[*x][*y] + 1).sum()
+    list_low_points(&map)
+        .iter()
+        .map(|(x, y)| map[*x][*y] + 1)
+        .sum()
 }
 
-pub fn part2(input: &str) -> u32 {
-    todo!()
+fn get_basin_size(low_point: &(usize, usize), map: &Vec<Vec<u32>>) -> usize {
+    let mut checked = HashSet::new();
+    let mut tbd = VecDeque::from(vec![*low_point]);
+    while !tbd.is_empty() {
+        let (x, y) = tbd.pop_front().unwrap();
+        if map[x][y] < 9 {
+            checked.insert((x, y));
+            if x > 0 && !checked.contains(&(x - 1, y)) {
+                tbd.push_back((x - 1, y));
+            }
+            if y > 0 && !checked.contains(&(x, y - 1)) {
+                tbd.push_back((x, y - 1));
+            }
+            if x < map.len() - 1 && !checked.contains(&(x + 1, y)) {
+                tbd.push_back((x + 1, y));
+            }
+            if y < map[0].len() - 1 && !checked.contains(&(x, y + 1)) {
+                tbd.push_back((x, y + 1));
+            }
+        }
+    }
+    checked.len()
+}
+
+pub fn part2(input: &str) -> usize {
+    let map = parse_heightmap(input);
+    let low_points = list_low_points(&map);
+    let mut basins: Vec<usize> = low_points
+        .iter()
+        .map(|point| get_basin_size(point, &map))
+        .collect();
+    basins.sort_unstable();
+    basins.reverse();
+    basins.iter().take(3).copied().reduce(|x, y| x * y).unwrap()
 }
 
 #[cfg(test)]
@@ -67,7 +105,6 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
         assert_eq!(part2(DATA), 1134);
     }
