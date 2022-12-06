@@ -1,39 +1,22 @@
 use std::collections::HashSet;
 
 pub fn part1(input: &str) -> usize {
+    find_unique_sequence(input, 4)
+}
+
+fn find_unique_sequence(input: &str, window_size: usize) -> usize {
     input
-        .chars()
+        .as_bytes()
+        .windows(window_size)
         .enumerate()
-        .find(|(i, _)| {
-            input
-                .chars()
-                .skip(*i)
-                .take(4)
-                .collect::<HashSet<char>>()
-                .len()
-                == 4
-        })
+        .find(|(_, items)| items.iter().collect::<HashSet<&u8>>().len() == window_size)
         .map(|(i, _)| i)
         .unwrap()
-        + 4
+        + window_size
 }
 
 pub fn part2(input: &str) -> usize {
-    input
-        .chars()
-        .enumerate()
-        .find(|(i, _)| {
-            input
-                .chars()
-                .skip(*i)
-                .take(14)
-                .collect::<HashSet<char>>()
-                .len()
-                == 14
-        })
-        .map(|(i, _)| i)
-        .unwrap()
-        + 14
+    find_unique_sequence(input, 14)
 }
 
 #[cfg(test)]
