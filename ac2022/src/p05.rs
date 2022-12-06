@@ -9,8 +9,8 @@ use nom::IResult;
 
 #[derive(Copy, Clone, Debug)]
 enum Element {
-Present(char),
-Empty,
+    Present(char),
+    Empty,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -71,12 +71,12 @@ fn index_row(input: &str) -> IResult<&str, Vec<u8>> {
 
 fn transpose<T: Copy>(original: &Vec<Vec<T>>) -> Vec<Vec<T>> {
     (0..original[0].len())
-    .map(|index2| {
+        .map(|index2| {
             (0..original.len())
-            .map(|index1| original[index1][index2])
-            .collect()
+                .map(|index1| original[index1][index2])
+                .collect()
         })
-    .collect()
+        .collect()
 }
 
 fn stack(input: &str) -> IResult<&str, Vec<Vec<char>>> {
@@ -86,16 +86,16 @@ fn stack(input: &str) -> IResult<&str, Vec<Vec<char>>> {
     stack.reverse();
     let stack = transpose(&stack);
     let stack = stack
-    .iter()
-    .map(|line| {
+        .iter()
+        .map(|line| {
             line.iter()
-            .filter_map(|elem| match *elem {
-                        Element::Present(x) => Some(x),
-                        Element::Empty => None,
+                .filter_map(|elem| match *elem {
+                    Element::Present(x) => Some(x),
+                    Element::Empty => None,
                 })
-            .collect()
+                .collect()
         })
-    .collect();
+        .collect();
     Ok((input, stack))
 }
 
@@ -153,6 +153,7 @@ move 1 from 1 to 2
     fn test_part1() {
         assert_eq!(part1(DATA), "CMZ");
     }
+
     #[test]
     fn test_part2() {
         assert_eq!(part2(DATA), "MCD");
