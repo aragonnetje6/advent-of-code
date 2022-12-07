@@ -1,9 +1,5 @@
 use std::collections::HashSet;
 
-pub fn part1(input: &str) -> usize {
-    find_unique_sequence(input, 4)
-}
-
 fn find_unique_sequence(input: &str, window_size: usize) -> usize {
     input
         .as_bytes()
@@ -13,6 +9,10 @@ fn find_unique_sequence(input: &str, window_size: usize) -> usize {
         .map(|(i, _)| i)
         .unwrap()
         + window_size
+}
+
+pub fn part1(input: &str) -> usize {
+    find_unique_sequence(input, 4)
 }
 
 pub fn part2(input: &str) -> usize {

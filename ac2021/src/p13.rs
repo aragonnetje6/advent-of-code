@@ -136,6 +136,6 @@ fold along x=5
 
     #[test]
     fn test_part2() {
-        println!("{}", part2(DATA));
+        part2(DATA);
     }
 }
