@@ -173,22 +173,14 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
     const DATA2: &str =
         r"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
     #[test]
-    fn test_part1_small() {
+    fn test_part1() {
         assert_eq!(part1(DATA2), 0);
-    }
-
-    #[test]
-    fn test_part1_big() {
         assert_eq!(part1(DATA1), 26);
     }
 
     #[test]
-    fn test_part2_small() {
+    fn test_part2() {
         assert_eq!(part2(DATA2), 5353);
-    }
-
-    #[test]
-    fn test_part2_big() {
         assert_eq!(part2(DATA1), 61229);
     }
 }
