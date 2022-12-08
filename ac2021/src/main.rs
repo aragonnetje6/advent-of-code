@@ -1,3 +1,6 @@
+#![feature(array_chunks)]
+#![feature(array_windows)]
+
 use lib::wrapper;
 
 mod p01;
@@ -43,5 +46,5 @@ fn main() {
     wrapper(2021, 13, 1, p13::part1);
     wrapper(2021, 13, 2, p13::part2);
     wrapper(2021, 14, 1, p14::part1);
-    // wrapper(2021, 14, 2, p14::part2);
+    wrapper(2021, 14, 2, p14::part2);
 }
