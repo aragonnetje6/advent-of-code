@@ -1,4 +1,3 @@
-#![feature(array_chunks)]
 #![feature(array_windows)]
 
 use lib::wrapper;

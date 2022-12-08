@@ -83,90 +83,62 @@ pub fn part1(input: &str) -> usize {
     minmax(&frequencies(&polymer))
 }
 
-// fn recursive_apply(
-//     chunk: [char; 2],
-//     rules: &HashMap<[char; 2], Vec<char>>,
-//     count: u8,
-// ) -> HashMap<char, usize> {
-//     if let Some(expanded) = rules.get(&chunk).cloned() {
-//         if count == 1 {
-//             expanded.iter().map(|x| (*x, 1)).collect()
-//         } else {
-//             let freqs = expanded
-//                 .array_windows::<2>()
-//                 .map(|x| recursive_apply(dbg!(*x), rules, dbg!(count - 1)))
-//                 .collect::<Vec<_>>();
-//             merge_maps(&freqs)
-//         }
-//     } else {
-//         chunk.iter().map(|x| (*x, 1)).collect()
-//     }
-// }
+fn transform_rules3(rules: &HashMap<[char; 2], Vec<char>>) -> HashMap<[char; 2], Vec<[char; 2]>> {
+    rules
+        .iter()
+        .map(|(chars, res)| (*chars, res.array_windows::<2>().copied().collect()))
+        .collect()
+}
 
-// fn merge_maps<T: Eq + Hash + Copy, N: AddAssign + Copy>(
-//     frequencies: &[HashMap<T, N>],
-// ) -> HashMap<T, N> {
-//     let mut result = HashMap::new();
-//     for map in frequencies.iter() {
-//         map.iter().for_each(|(c, i)| match result.get_mut(c) {
-//             None => {
-//                 result.insert(*c, *i);
-//             }
-//             Some(x) => *x += *i,
-//         });
-//     }
-//     result
-// }
-
-fn merge_apply(
+fn statistical_solve(
     polymer: &[char],
-    rules: &HashMap<[char; 2], Vec<char>>,
+    rules: &HashMap<[char; 2], Vec<[char; 2]>>,
     count: u8,
-    out: &mut HashMap<char, usize>,
-) {
-    if count > 1 {
-        if count > 20 {
-            println!("{count}");
-        }
-        polymer
-            .array_windows::<2>()
-            .for_each(|chunk| match rules.get(chunk) {
-                None => match out.get_mut(&chunk[0]) {
-                    None => {
-                        out.insert(chunk[0], 1);
-                    }
-                    Some(x) => *x += 1,
-                },
-                Some(expanded) => merge_apply(expanded, rules, count - 1, out),
-            });
-    } else {
-        polymer
-            .array_windows::<2>()
-            .map(|chunk| match rules.get(chunk) {
-                None => chunk.to_vec(),
-                Some(expanded) => expanded.clone(),
-            })
-            .for_each(|chunk| {
-                for c in chunk.iter().take(2) {
-                    match out.get_mut(c) {
-                        None => {
-                            out.insert(*c, 1);
-                        }
-                        Some(x) => *x += 1,
+) -> HashMap<char, usize> {
+    let mut set_counts: HashMap<[char; 2], usize> = HashMap::new();
+    for window in polymer.array_windows() {
+        add_to_map(&mut set_counts, *window, 1);
+    }
+    for _ in 0..count {
+        let mut new_set_counts: HashMap<[char; 2], usize> =
+            rules.values().flatten().map(|x| (*x, 0)).collect();
+        for (set, set_count) in &set_counts {
+            match rules.get(set) {
+                None => add_to_map(&mut new_set_counts, *set, *set_count),
+                Some(sets) => {
+                    for set in sets {
+                        add_to_map(&mut new_set_counts, *set, *set_count);
                     }
                 }
-            });
+            }
+        }
+        set_counts = new_set_counts;
+    }
+    let mut frequencies = HashMap::new();
+    set_counts
+        .iter()
+        .flat_map(|(set, count)| [(set[0], *count), (set[1], *count)])
+        .for_each(|(c, count)| add_to_map(&mut frequencies, c, count));
+    frequencies
+}
+
+fn add_to_map<T: Hash + Eq>(map: &mut HashMap<T, usize>, index: T, val: usize) {
+    match map.get_mut(&index) {
+        None => {
+            map.insert(index, val);
+        }
+        Some(x) => {
+            *x += val;
+        }
     }
 }
 
 pub fn part2(input: &str) -> usize {
     let (_, (polymer, rules)) = parse_input(input).unwrap();
-    let rules = transform_rules2(&rules);
+    let rules = transform_rules3(&transform_rules2(&rules));
     let polymer: Vec<char> = polymer.chars().collect();
-    let mut frequencies = HashMap::new();
-    merge_apply(&polymer, &rules, 40, &mut frequencies);
-    *frequencies.get_mut(polymer.last().unwrap()).unwrap() += 1;
-    minmax(&frequencies)
+    let frequencies = statistical_solve(&polymer, &rules, 40);
+    minmax(&frequencies) / 2 + 1
 }
 
 #[cfg(test)]
