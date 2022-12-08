@@ -1,5 +1,3 @@
-#![feature(array_windows)]
-
 use lib::wrapper;
 
 mod p01;

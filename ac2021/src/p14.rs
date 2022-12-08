@@ -86,7 +86,7 @@ pub fn part1(input: &str) -> usize {
 fn transform_rules3(rules: &HashMap<[char; 2], Vec<char>>) -> HashMap<[char; 2], Vec<[char; 2]>> {
     rules
         .iter()
-        .map(|(chars, res)| (*chars, res.array_windows::<2>().copied().collect()))
+        .map(|(chars, res)| (*chars, res.windows(2).map(|iter| [iter[0], iter[1]]).collect()))
         .collect()
 }
 
@@ -96,8 +96,8 @@ fn statistical_solve(
     count: u8,
 ) -> HashMap<char, usize> {
     let mut set_counts: HashMap<[char; 2], usize> = HashMap::new();
-    for window in polymer.array_windows() {
-        add_to_map(&mut set_counts, *window, 1);
+    for window in polymer.windows(2).map(|iter| [iter[0], iter[1]]) {
+        add_to_map(&mut set_counts, window, 1);
     }
     for _ in 0..count {
         let mut new_set_counts: HashMap<[char; 2], usize> =
