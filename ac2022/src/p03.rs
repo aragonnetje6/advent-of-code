@@ -16,7 +16,7 @@ impl Item {
                 .chain('A'..='Z')
                 .collect::<String>()
                 .find(c)
-                .unwrap() as usize
+                .unwrap()
                 + 1,
         }
     }

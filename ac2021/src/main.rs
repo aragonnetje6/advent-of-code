@@ -14,6 +14,7 @@ mod p11;
 mod p12;
 mod p13;
 mod p14;
+mod p15;
 
 fn main() {
     wrapper(2021, 1, 1, p01::part1);
@@ -44,4 +45,6 @@ fn main() {
     wrapper(2021, 13, 2, p13::part2);
     wrapper(2021, 14, 1, p14::part1);
     wrapper(2021, 14, 2, p14::part2);
+    // wrapper(2021, 15, 1, p15::part1);
+    // wrapper(2021, 15, 2, p15::part2);
 }

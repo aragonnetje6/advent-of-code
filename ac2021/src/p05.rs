@@ -99,7 +99,7 @@ impl Seabed {
     fn get_greater_than(&self, n: u32) -> usize {
         self.field
             .iter()
-            .map(|line| line.iter().filter(|x| **x > n).count() as usize)
+            .map(|line| line.iter().filter(|x| **x > n).count())
             .sum()
     }
 }
