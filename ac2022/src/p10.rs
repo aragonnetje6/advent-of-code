@@ -64,7 +64,7 @@ impl Cpu {
         }
         match self.busy {
             Busy::No => {
-                match self.instructions[self.index] {
+                match *self.instructions.get(self.index).unwrap() {
                     Instruction::Noop => {}
                     Instruction::AddX(x) => {
                         self.busy = Busy::AddX(x, 1);
@@ -102,7 +102,7 @@ pub fn part2(input: &str) -> String {
     while cpu.cycle() {
         screen.push(cpu.draw());
     }
-    let text: Vec<char> = screen.iter().map(|x| if *x { '#' } else { '.' }).collect();
+    let text: Vec<char> = screen.iter().map(|x| if *x { '#' } else { ' ' }).collect();
     text.chunks(40)
         .map(|x| "\n".to_string() + &x.iter().collect::<String>())
         .collect()
@@ -267,6 +267,6 @@ noop
 
     #[test]
     fn test_part2() {
-        println!("{}", part2(DATA1));
+        part2(DATA1);
     }
 }
