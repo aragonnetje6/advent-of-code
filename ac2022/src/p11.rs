@@ -11,15 +11,15 @@ fn number<T: FromStr>(input: &str) -> IResult<&str, T> {
     map_res(digit1, str::parse)(input)
 }
 
-fn starting_items(input: &str) -> IResult<&str, Vec<u32>> {
+fn starting_items(input: &str) -> IResult<&str, Vec<u128>> {
     let (input, _) = tag("  Starting items: ")(input)?;
     separated_list1(tag(", "), number)(input)
 }
 
 #[derive(Debug)]
 enum Operation {
-    Multiply(u32),
-    Add(u32),
+    Multiply(u128),
+    Add(u128),
     Square,
 }
 
@@ -45,7 +45,7 @@ fn operation(input: &str) -> IResult<&str, Operation> {
     alt((multiply_operation, add_operation, square_operation))(input)
 }
 
-fn test(input: &str) -> IResult<&str, u32> {
+fn test(input: &str) -> IResult<&str, u128> {
     let (input, _) = tag("  Test: divisible by ")(input)?;
     number(input)
 }
@@ -93,15 +93,15 @@ fn monkeys(input: &str) -> IResult<&str, Vec<Monkey>> {
 
 #[derive(Debug)]
 struct Monkey {
-    items: Vec<u32>,
+    items: Vec<u128>,
     operation: Operation,
-    test: u32,
+    test: u128,
     if_true: usize,
     if_false: usize,
-    inspections: u32,
+    inspections: u128,
 }
 
-fn run_monkeys(monkeys: &mut Vec<Monkey>) {
+fn run_monkeys(monkeys: &mut Vec<Monkey>, div_by_three: bool) {
     for i in 0..monkeys.len() {
         while !monkeys[i].items.is_empty() {
             monkeys[i].inspections += 1;
@@ -109,9 +109,9 @@ fn run_monkeys(monkeys: &mut Vec<Monkey>) {
             let operated_item = match monkeys[i].operation {
                 Operation::Multiply(x) => item * x,
                 Operation::Add(x) => item + x,
-                Operation::Square => item * item,
-            } / 3;
-            let destination = if operated_item % monkeys[i].test == 0 {
+                Operation::Square => item.pow(2),
+            } / (if div_by_three {3} else {1});
+            let destination = if operated_item % monkeys[i].test == u128::from(0u8) {
                 monkeys[i].if_true
             } else {
                 monkeys[i].if_false
@@ -121,10 +121,10 @@ fn run_monkeys(monkeys: &mut Vec<Monkey>) {
     }
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> u128 {
     let (_, mut data) = monkeys(input).unwrap();
     for _ in 0..20 {
-        run_monkeys(&mut data);
+        run_monkeys(&mut data, true);
     }
     data.sort_unstable_by_key(|x| x.inspections);
     data.iter()
@@ -135,10 +135,10 @@ pub fn part1(input: &str) -> u32 {
         .unwrap()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> u128 {
     let (_, mut data) = monkeys(input).unwrap();
-    for _ in 0..100 {
-        run_monkeys(&mut data);
+    for _ in 0..650 {
+        run_monkeys(&mut data, false);
     }
     data.sort_unstable_by_key(|x| x.inspections);
     data.iter()
@@ -188,8 +188,7 @@ Monkey 3:
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        println!("{}", part2(DATA1));
+        assert_eq!(part2(DATA1), 2_713_310_158);
     }
 }
