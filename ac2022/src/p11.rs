@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use nom::branch::alt;
@@ -11,15 +12,15 @@ fn number<T: FromStr>(input: &str) -> IResult<&str, T> {
     map_res(digit1, str::parse)(input)
 }
 
-fn starting_items(input: &str) -> IResult<&str, Vec<u128>> {
+fn starting_items(input: &str) -> IResult<&str, Vec<u32>> {
     let (input, _) = tag("  Starting items: ")(input)?;
     separated_list1(tag(", "), number)(input)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Operation {
-    Multiply(u128),
-    Add(u128),
+    Multiply(u32),
+    Add(u32),
     Square,
 }
 
@@ -45,7 +46,7 @@ fn operation(input: &str) -> IResult<&str, Operation> {
     alt((multiply_operation, add_operation, square_operation))(input)
 }
 
-fn test(input: &str) -> IResult<&str, u128> {
+fn test(input: &str) -> IResult<&str, u32> {
     let (input, _) = tag("  Test: divisible by ")(input)?;
     number(input)
 }
@@ -91,17 +92,17 @@ fn monkeys(input: &str) -> IResult<&str, Vec<Monkey>> {
     separated_list1(newline, monkey)(input)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Monkey {
-    items: Vec<u128>,
+    items: Vec<u32>,
     operation: Operation,
-    test: u128,
+    test: u32,
     if_true: usize,
     if_false: usize,
     inspections: u128,
 }
 
-fn run_monkeys(monkeys: &mut Vec<Monkey>, div_by_three: bool) {
+fn run_monkeys(monkeys: &mut Vec<Monkey>) {
     for i in 0..monkeys.len() {
         while !monkeys[i].items.is_empty() {
             monkeys[i].inspections += 1;
@@ -110,8 +111,8 @@ fn run_monkeys(monkeys: &mut Vec<Monkey>, div_by_three: bool) {
                 Operation::Multiply(x) => item * x,
                 Operation::Add(x) => item + x,
                 Operation::Square => item.pow(2),
-            } / (if div_by_three {3} else {1});
-            let destination = if operated_item % monkeys[i].test == u128::from(0u8) {
+            } / 3;
+            let destination = if operated_item % monkeys[i].test == u32::from(0u8) {
                 monkeys[i].if_true
             } else {
                 monkeys[i].if_false
@@ -121,10 +122,109 @@ fn run_monkeys(monkeys: &mut Vec<Monkey>, div_by_three: bool) {
     }
 }
 
+#[derive(Debug)]
+struct Item {
+    modulo_primes: HashMap<u32, u32>,
+}
+
+impl Item {
+    fn new(primes: &[u32], value: u32) -> Self {
+        Self {
+            modulo_primes: primes.iter().map(|prime| (*prime, value % prime)).collect(),
+        }
+    }
+
+    fn add(&mut self, x: u32) {
+        for (prime, modulo) in &mut self.modulo_primes {
+            *modulo = (*modulo + x) % prime;
+        }
+    }
+
+    fn multiply(&mut self, x: u32) {
+        for (prime, modulo) in &mut self.modulo_primes {
+            *modulo = (*modulo * x) % prime;
+        }
+    }
+
+    fn square(&mut self) {
+        for (prime, modulo) in &mut self.modulo_primes {
+            *modulo = modulo.pow(2) % prime;
+        }
+    }
+
+    fn is_divisible_by(&self, x: u32) -> bool {
+        *self.modulo_primes.get(&x).unwrap() == 0
+    }
+}
+
+#[derive(Debug)]
+struct SmartMonkey {
+    items: Vec<Item>,
+    operation: Operation,
+    test: u32,
+    if_true: usize,
+    if_false: usize,
+    inspections: u128,
+}
+
+impl SmartMonkey {
+    fn from_monkeys(monkeys: &[Monkey]) -> Vec<Self> {
+        let primes: Vec<u32> = monkeys
+            .iter()
+            .map(|x| x.test)
+            .chain(monkeys.iter().filter_map(|monkey| match monkey.operation {
+                Operation::Multiply(x) => Some(x),
+                _ => None,
+            }))
+            .collect();
+        monkeys
+            .iter()
+            .cloned()
+            .map(
+                |Monkey {
+                     items,
+                     operation,
+                     test,
+                     if_true,
+                     if_false,
+                     inspections,
+                 }| SmartMonkey {
+                    operation,
+                    test,
+                    if_true,
+                    if_false,
+                    inspections,
+                    items: items.iter().map(|x| Item::new(&primes, *x)).collect(),
+                },
+            )
+            .collect()
+    }
+}
+
+fn run_monkeys2(monkeys: &mut Vec<SmartMonkey>) {
+    for i in 0..monkeys.len() {
+        while !monkeys[i].items.is_empty() {
+            monkeys[i].inspections += 1;
+            let mut item = monkeys[i].items.drain(..1).next().unwrap();
+            match monkeys[i].operation {
+                Operation::Multiply(x) => item.multiply(x),
+                Operation::Add(x) => item.add(x),
+                Operation::Square => item.square(),
+            };
+            let destination = if item.is_divisible_by(monkeys[i].test) {
+                monkeys[i].if_true
+            } else {
+                monkeys[i].if_false
+            };
+            monkeys[destination].items.push(item);
+        }
+    }
+}
+
 pub fn part1(input: &str) -> u128 {
     let (_, mut data) = monkeys(input).unwrap();
-    for _ in 0..20 {
-        run_monkeys(&mut data, true);
+    for _ in 1..=20 {
+        run_monkeys(&mut data);
     }
     data.sort_unstable_by_key(|x| x.inspections);
     data.iter()
@@ -136,12 +236,14 @@ pub fn part1(input: &str) -> u128 {
 }
 
 pub fn part2(input: &str) -> u128 {
-    let (_, mut data) = monkeys(input).unwrap();
-    for _ in 0..650 {
-        run_monkeys(&mut data, false);
+    let (_, data) = monkeys(input).unwrap();
+    let mut smart_monkeys = SmartMonkey::from_monkeys(&data);
+    for _ in 1..=10000 {
+        run_monkeys2(&mut smart_monkeys);
     }
-    data.sort_unstable_by_key(|x| x.inspections);
-    data.iter()
+    smart_monkeys.sort_unstable_by_key(|x| x.inspections);
+    smart_monkeys
+        .iter()
         .rev()
         .take(2)
         .map(|x| x.inspections)
