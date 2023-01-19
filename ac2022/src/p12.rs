@@ -193,11 +193,11 @@ trait Pointy {
     fn get_point(&self) -> Point;
 }
 
-trait Nested : Sized {
+trait Nested: Sized {
     fn get_parent(&self) -> Option<Self>;
 }
 
-trait Height : Pointy {
+trait Height: Pointy {
     fn get_height(&self, grid: &Grid) -> u32 {
         match *grid[self.get_point().0].get(self.get_point().1).unwrap() {
             Tile::Normal(x) => x,
@@ -209,7 +209,7 @@ trait Height : Pointy {
 
 impl<T: Pointy> Height for T {}
 
-trait Path : Pointy + Nested {
+trait Path: Pointy + Nested {
     fn get_path(&self) -> Vec<Point> {
         if let Some(parent) = &self.get_parent() {
             let mut out = parent.get_path();
@@ -247,7 +247,7 @@ fn get_neighbours2(point: &SimplePathPoint, grid: &Grid) -> Vec<SimplePathPoint>
 
 fn bfs(grid: &Grid, start: Point, goal: u32) -> Vec<Point> {
     let mut queue = vec![SimplePathPoint::new(start, None)];
-    let mut closed= HashSet::new();
+    let mut closed = HashSet::new();
     loop {
         let current = queue.pop().unwrap();
         let neighbours = get_neighbours2(&current, grid);
