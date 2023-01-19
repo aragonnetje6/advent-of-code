@@ -1,5 +1,5 @@
 use std::cmp::{Ordering, Reverse};
-use std::collections::BinaryHeap;
+use std::collections::{BinaryHeap, HashSet};
 use std::rc::Rc;
 
 use nom::character::complete::{anychar, newline};
@@ -63,23 +63,17 @@ impl PathPoint {
     const fn total_cost(&self) -> usize {
         self.cost + self.end.0.abs_diff(self.point.0) + self.end.1.abs_diff(self.point.1)
     }
+}
 
-    fn get_height(&self, grid: &Grid) -> u32 {
-        match *grid[self.point.0].get(self.point.1).unwrap() {
-            Tile::Normal(x) => x,
-            Tile::Start => u32::from('a'),
-            Tile::End => u32::from('z'),
-        }
+impl Pointy for PathPoint {
+    fn get_point(&self) -> Point {
+        self.point
     }
+}
 
-    fn get_path(&self) -> Vec<Point> {
-        if let Some(parent) = &self.parent {
-            let mut out = parent.get_path();
-            out.push(self.point);
-            out
-        } else {
-            vec![self.point]
-        }
+impl Nested for PathPoint {
+    fn get_parent(&self) -> Option<Self> {
+        self.parent.clone().map(|x| (*x).clone())
     }
 }
 
@@ -130,7 +124,7 @@ fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
     let mut queue: BinaryHeap<Reverse<Rc<PathPoint>>> =
         BinaryHeap::from_iter(vec![Reverse(Rc::new(PathPoint::new(start, end, None)))]);
     let mut closed: Vec<Rc<PathPoint>> = vec![];
-    while queue.peek().unwrap().0.point != end {
+    loop {
         let current = queue.pop().unwrap().0;
         let neighbours = get_neighbours(&current, grid, end);
         for neighbour in neighbours {
@@ -149,7 +143,6 @@ fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
         closed.retain(|x| x.point != current.point || *x < current);
         closed.push(current);
     }
-    unreachable!()
 }
 
 fn find_tile(grid: &Grid, target: &Tile) -> Option<Point> {
@@ -172,13 +165,110 @@ pub fn part1(input: &str) -> usize {
     path.len() - 1
 }
 
-fn bfs(grid: &Grid, start: Point, goal: u32) -> usize {
-
+#[derive(Debug, Clone)]
+struct SimplePathPoint {
+    point: Point,
+    parent: Option<Box<SimplePathPoint>>,
 }
 
-pub fn part2(input: &str) -> u32 {
+impl SimplePathPoint {
+    fn new(point: Point, parent: Option<Box<SimplePathPoint>>) -> Self {
+        Self { point, parent }
+    }
+}
+
+impl Pointy for SimplePathPoint {
+    fn get_point(&self) -> Point {
+        self.point
+    }
+}
+
+impl Nested for SimplePathPoint {
+    fn get_parent(&self) -> Option<Self> {
+        self.parent.clone().map(|x| *x)
+    }
+}
+
+trait Pointy {
+    fn get_point(&self) -> Point;
+}
+
+trait Nested : Sized {
+    fn get_parent(&self) -> Option<Self>;
+}
+
+trait Height : Pointy {
+    fn get_height(&self, grid: &Grid) -> u32 {
+        match *grid[self.get_point().0].get(self.get_point().1).unwrap() {
+            Tile::Normal(x) => x,
+            Tile::Start => u32::from('a'),
+            Tile::End => u32::from('z'),
+        }
+    }
+}
+
+impl<T: Pointy> Height for T {}
+
+trait Path : Pointy + Nested {
+    fn get_path(&self) -> Vec<Point> {
+        if let Some(parent) = &self.get_parent() {
+            let mut out = parent.get_path();
+            out.push(self.get_point());
+            out
+        } else {
+            vec![self.get_point()]
+        }
+    }
+}
+
+impl<T: Pointy + Nested> Path for T {}
+
+fn get_neighbours2(point: &SimplePathPoint, grid: &Grid) -> Vec<SimplePathPoint> {
+    let mut out: Vec<Point> = vec![];
+    if point.point.0 > 0 {
+        out.push(Point(point.point.0 - 1, point.point.1));
+    }
+    if point.point.0 < grid.len() - 1 {
+        out.push(Point(point.point.0 + 1, point.point.1));
+    }
+    if point.point.1 > 0 {
+        out.push(Point(point.point.0, point.point.1 - 1));
+    }
+    if point.point.1 < grid[0].len() - 1 {
+        out.push(Point(point.point.0, point.point.1 + 1));
+    }
+    out.drain(..)
+        .map(|x| SimplePathPoint::new(x, Some(Box::new(point.clone()))))
+        .filter(|neighbour| {
+            i64::from(point.get_height(grid)) - i64::from(neighbour.get_height(grid)) <= 1
+        })
+        .collect()
+}
+
+fn bfs(grid: &Grid, start: Point, goal: u32) -> Vec<Point> {
+    let mut queue = vec![SimplePathPoint::new(start, None)];
+    let mut closed= HashSet::new();
+    loop {
+        let current = queue.pop().unwrap();
+        let neighbours = get_neighbours2(&current, grid);
+        for neighbour in neighbours {
+            if neighbour.get_height(grid) == goal {
+                return neighbour.get_path();
+            } else if !queue.iter().any(|x| x.point == neighbour.point)
+                && !closed.contains(&neighbour.point)
+            {
+                queue.insert(0, neighbour);
+            }
+        }
+        closed.insert(current.point);
+    }
+}
+
+pub fn part2(input: &str) -> usize {
     let (_, data) = grid(input).unwrap();
     let end = find_tile(&data, &Tile::End).unwrap();
+    let path = bfs(&data, end, u32::from('a'));
+    path.len() - 1
 }
 
 #[cfg(test)]
@@ -198,8 +288,7 @@ abdefghi
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 2_713_310_158);
+        assert_eq!(part2(DATA1), 29);
     }
 }
