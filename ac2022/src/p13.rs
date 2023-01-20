@@ -10,28 +10,19 @@ use nom::{
     IResult,
 };
 
-fn integer(input: &str) -> IResult<&str, Packet> {
-    map(nom::character::complete::u32, Packet::Integer)(input)
-}
-
-fn list(input: &str) -> IResult<&str, Packet> {
-    delimited(
-        char('['),
-        map(separated_list0(char(','), value), Packet::List),
-        char(']'),
-    )(input)
-}
-
 fn value(input: &str) -> IResult<&str, Packet> {
-    alt((integer, list))(input)
-}
-
-fn pair(input: &str) -> IResult<&str, PacketPair> {
-    separated_pair(value, newline, value)(input)
+    alt((
+        map(nom::character::complete::u32, Packet::Number),
+        delimited(
+            char('['),
+            map(separated_list0(char(','), value), Packet::List),
+            char(']'),
+        ),
+    ))(input)
 }
 
 fn parse_signal(input: &str) -> IResult<&str, Vec<PacketPair>> {
-    separated_list1(count(newline, 2), pair)(input)
+    separated_list1(count(newline, 2), separated_pair(value, newline, value))(input)
 }
 
 type PacketPair = (Packet, Packet);
@@ -39,40 +30,30 @@ type PacketPair = (Packet, Packet);
 #[derive(Debug, Eq, PartialEq, Clone)]
 enum Packet {
     List(Vec<Packet>),
-    Integer(u32),
+    Number(u32),
 }
 
 impl PartialOrd<Self> for Packet {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        println!("Comparing {self} vs {other}");
-        Some(match self {
-            Packet::List(left) => match other {
-                Packet::List(right) => left
-                    .iter()
-                    .zip(right.iter())
-                    .map(|(x, y)| x.cmp(y))
-                    .find(|ord| *ord != Ordering::Equal)
-                    .unwrap_or_else(|| left.len().cmp(&right.len())),
-                Packet::Integer(_) => Self::cmp(self, &Packet::List(vec![self.clone()])),
-            },
-            Packet::Integer(left) => match other {
-                Packet::List(_) => Self::cmp(&Packet::List(vec![self.clone()]), other),
-                Packet::Integer(right) => left.cmp(right),
-            },
-        })
+        Some(self.cmp(other))
     }
 }
 
 impl Ord for Packet {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).expect("WTF")
+        match (self, other) {
+            (Packet::List(left), Packet::List(right)) => left.cmp(right),
+            (Packet::List(left), Packet::Number(_)) => left.cmp(&vec![other.clone()]),
+            (Packet::Number(_), Packet::List(right)) => vec![self.clone()].cmp(right),
+            (Packet::Number(left), Packet::Number(right)) => left.cmp(right),
+        }
     }
 }
 
 impl Display for Packet {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Packet::Integer(x) => write!(f, "{x}"),
+            Packet::Number(x) => write!(f, "{x}"),
             Packet::List(arr) => write!(
                 f,
                 "[{}]",
@@ -86,13 +67,10 @@ impl Display for Packet {
 }
 
 pub fn part1(input: &str) -> usize {
-    let (_, data) = parse_signal(input).unwrap();
-    // for pair in &data {
-    //     println!("{}", pair.0 <= pair.1);
-    //     println!();
-    // }
-    // println!("{}", data.len());
-    data.iter()
+    parse_signal(input)
+        .unwrap()
+        .1
+        .iter()
         .enumerate()
         .filter_map(|(i, (left, right))| if left <= right { Some(i + 1) } else { None })
         .sum()
