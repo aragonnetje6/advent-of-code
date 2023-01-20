@@ -132,20 +132,8 @@ impl IndexMut<(usize, usize)> for CaveWall {
 impl From<&[Vec<Point>]> for CaveWall {
     fn from(formation: &[Vec<Point>]) -> Self {
         let x_min = 0;
-            // *formation
-            // .iter()
-            // .flatten()
-            // .map(|Point { x, .. }| x)
-            // .min()
-            // .unwrap();
         let y_min = 0;
         let x_max = 1000;
-            // *formation
-            // .iter()
-            // .flatten()
-            // .map(|Point { x, .. }| x)
-            // .max()
-            // .unwrap();
         let y_max = *formation
             .iter()
             .flatten()
