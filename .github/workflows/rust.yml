@@ -15,12 +15,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build
-    - name: Test
-      run: cargo test
-    - name: Run 2021
-      run: cargo run --bin ac2021
-    - name: Run 2022
-      run: cargo run --bin ac2022
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build
+          & cargo build --release
+      - name: Test
+        run: cargo test
+      - name: Run 2021
+        run: cargo run --bin ac2021 --release
+      - name: Run 2022
+        run: cargo run --bin ac2022 --release
