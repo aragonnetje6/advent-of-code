@@ -1,11 +1,9 @@
-use std::hash::Hash;
+#![allow(clippy::cast_possible_wrap)]
 
-use nom::bytes::complete::tag;
-use nom::character::streaming::newline;
-use nom::combinator::map;
-use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
-use nom::IResult;
+use nom::{
+    bytes::complete::tag, character::complete::newline, combinator::map, multi::separated_list1,
+    sequence::separated_pair, IResult,
+};
 
 fn location(input: &str) -> IResult<&str, (i32, i32)> {
     let (input, _) = tag("x=")(input)?;
@@ -33,7 +31,7 @@ fn parse_data(input: &str) -> IResult<&str, Vec<Sensor>> {
     separated_list1(newline, sensor)(input)
 }
 
-trait Location: Hash {
+trait Location {
     fn x(&self) -> i32;
     fn y(&self) -> i32;
     fn hamming_dist(&self, other: &impl Location) -> u32 {
@@ -41,7 +39,7 @@ trait Location: Hash {
     }
 }
 
-#[derive(Hash, Debug)]
+#[derive(Debug)]
 struct Sensor {
     x: i32,
     y: i32,
@@ -64,7 +62,7 @@ impl Sensor {
     }
 }
 
-#[derive(Hash, Debug)]
+#[derive(Debug)]
 struct Beacon {
     x: i32,
     y: i32,
@@ -92,12 +90,10 @@ pub fn part1(input: &str) -> usize {
         .map(|sensor| sensor.x + sensor.range() as i32)
         .max()
         .unwrap();
-    // let min_y = data.iter().map(|sensor| sensor.y - sensor.range() as i32).min().unwrap();
-    // let max_y = data.iter().map(|sensor| sensor.y + sensor.range() as i32).min().unwrap();
+    #[cfg(not(test))]
     let y = 2_000_000;
     #[cfg(test)]
     let y = 10;
-    println!("{y}");
     (min_x..=max_x)
         .filter(|&x| {
             sensors
@@ -110,8 +106,30 @@ pub fn part1(input: &str) -> usize {
         .count()
 }
 
-pub fn part2(input: &str) -> usize {
-    todo!();
+pub fn part2(input: &str) -> i64 {
+    let (_, sensors) = parse_data(input).unwrap();
+    #[cfg(not(test))]
+    let max = 4_000_000;
+    #[cfg(test)]
+    let max = 20;
+    let (x, y) = find_gap(&sensors, max);
+    i64::from(x) * 4_000_000 + i64::from(y)
+}
+
+fn find_gap(sensors: &[Sensor], max: i32) -> (i32, i32) {
+    let mut x = 0;
+    let mut y = 0;
+    while let Some(sensor) = sensors
+        .iter()
+        .find(|sensor| sensor.range() >= sensor.hamming_dist(&Beacon { x, y }))
+    {
+        x += 1 + sensor.x - x + (sensor.range() - y.abs_diff(sensor.y)) as i32;
+        if x > max {
+            y += 1;
+            x = 0;
+        }
+    }
+    (x, y)
 }
 
 #[cfg(test)]
@@ -140,8 +158,7 @@ Sensor at x=20, y=1: closest beacon is at x=15, y=3
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 56000011);
+        assert_eq!(part2(DATA1), 56_000_011);
     }
 }
