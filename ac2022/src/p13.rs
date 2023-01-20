@@ -10,19 +10,19 @@ use nom::{
     IResult,
 };
 
-fn value(input: &str) -> IResult<&str, Packet> {
+fn packet(input: &str) -> IResult<&str, Packet> {
     alt((
         map(nom::character::complete::u32, Packet::Number),
         delimited(
             char('['),
-            map(separated_list0(char(','), value), Packet::List),
+            map(separated_list0(char(','), packet), Packet::List),
             char(']'),
         ),
     ))(input)
 }
 
 fn parse_signal(input: &str) -> IResult<&str, Vec<PacketPair>> {
-    separated_list1(count(newline, 2), separated_pair(value, newline, value))(input)
+    separated_list1(count(newline, 2), separated_pair(packet, newline, packet))(input)
 }
 
 type PacketPair = (Packet, Packet);
@@ -76,8 +76,24 @@ pub fn part1(input: &str) -> usize {
         .sum()
 }
 
-pub fn part2(input: &str) -> u32 {
-    todo!()
+fn transform_data(mut data: Vec<PacketPair>) -> Vec<Packet> {
+    data.drain(..).flat_map(|(p1, p2)| [p1, p2]).collect()
+}
+
+pub fn part2(input: &str) -> usize {
+    let mut signal = transform_data(parse_signal(input).unwrap().1);
+    let divs = vec![packet("[[2]]").unwrap().1, packet("[[6]]").unwrap().1];
+    signal.append(&mut divs.clone());
+    signal.sort_unstable();
+    divs.iter()
+        .map(|div| {
+            signal
+                .iter()
+                .enumerate()
+                .find_map(|(i, x)| if x == div { Some(i + 1) } else { None })
+                .unwrap()
+        })
+        .product()
 }
 
 #[cfg(test)]
@@ -114,8 +130,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 29);
+        assert_eq!(part2(DATA1), 140);
     }
 }
