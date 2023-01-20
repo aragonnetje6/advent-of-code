@@ -55,6 +55,7 @@ struct CaveWall {
     y_min: usize,
     x_max: usize,
     y_max: usize,
+    has_floor: bool,
 }
 
 impl CaveWall {
@@ -77,9 +78,17 @@ impl CaveWall {
     }
 
     fn drop_sand(&mut self, mut x: usize, mut y: usize) -> bool {
+        if self[(x, y)] == Tile::Sand {
+            return false;
+        }
         loop {
             if y == self.y_max {
-                return false;
+                return if self.has_floor {
+                    self[(x, y)] = Tile::Sand;
+                    true
+                } else {
+                    false
+                }
             } else if self[(x, y + 1)] == Tile::Air {
                 y += 1;
             } else if x == self.x_min {
@@ -122,25 +131,27 @@ impl IndexMut<(usize, usize)> for CaveWall {
 
 impl From<&[Vec<Point>]> for CaveWall {
     fn from(formation: &[Vec<Point>]) -> Self {
-        let x_min = *formation
-            .iter()
-            .flatten()
-            .map(|Point { x, .. }| x)
-            .min()
-            .unwrap();
+        let x_min = 0;
+            // *formation
+            // .iter()
+            // .flatten()
+            // .map(|Point { x, .. }| x)
+            // .min()
+            // .unwrap();
         let y_min = 0;
-        let x_max = *formation
-            .iter()
-            .flatten()
-            .map(|Point { x, .. }| x)
-            .max()
-            .unwrap();
+        let x_max = 1000;
+            // *formation
+            // .iter()
+            // .flatten()
+            // .map(|Point { x, .. }| x)
+            // .max()
+            // .unwrap();
         let y_max = *formation
             .iter()
             .flatten()
             .map(|Point { y, .. }| y)
             .max()
-            .unwrap();
+            .unwrap() + 1;
         let grid = vec![vec![Tile::Air; x_max - x_min + 1]; y_max - y_min + 1];
         let mut result = Self {
             grid,
@@ -148,6 +159,7 @@ impl From<&[Vec<Point>]> for CaveWall {
             y_min,
             x_max,
             y_max,
+            has_floor: false,
         };
         for path in formation {
             result.add_path(path);
@@ -199,7 +211,11 @@ pub fn part1(input: &str) -> usize {
 }
 
 pub fn part2(input: &str) -> usize {
-    todo!();
+    let (_, data) = formation(input).unwrap();
+    let mut wall = CaveWall::from(&*data);
+    wall.has_floor = true;
+    while wall.drop_sand(500, 0) {}
+    wall.count(Tile::Sand)
 }
 
 #[cfg(test)]
@@ -216,8 +232,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 140);
+        assert_eq!(part2(DATA1), 93);
     }
 }
