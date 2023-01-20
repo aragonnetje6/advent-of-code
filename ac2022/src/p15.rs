@@ -78,14 +78,14 @@ impl Location for Beacon {
     }
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> i32 {
     let (_, sensors) = parse_data(input).unwrap();
-    let min_x = sensors
+    let min = sensors
         .iter()
         .map(|sensor| sensor.x - sensor.range() as i32)
         .min()
         .unwrap();
-    let max_x = sensors
+    let max = sensors
         .iter()
         .map(|sensor| sensor.x + sensor.range() as i32)
         .max()
@@ -94,16 +94,29 @@ pub fn part1(input: &str) -> usize {
     let y = 2_000_000;
     #[cfg(test)]
     let y = 10;
-    (min_x..=max_x)
-        .filter(|&x| {
-            sensors
-                .iter()
-                .any(|sensor| sensor.range() >= sensor.hamming_dist(&Beacon { x, y }))
-                && !sensors
-                    .iter()
-                    .any(|Sensor { beacon, .. }| beacon.x == x && beacon.y == y)
-        })
-        .count()
+    get_closed_spaces(&sensors, min, max, y)
+}
+
+fn get_closed_spaces(sensors: &[Sensor], min: i32, max: i32, y: i32) -> i32 {
+    let mut x = min;
+    let mut total = 0;
+    let mut jumped_last = false;
+    loop {
+        if let Some(sensor) = sensors
+            .iter()
+            .find(|sensor| sensor.range() >= sensor.hamming_dist(&Beacon { x, y }))
+        {
+            total += i32::from(jumped_last) + sensor.x - x + (sensor.range() - y.abs_diff(sensor.y)) as i32;
+            jumped_last = true;
+            x += 1 + sensor.x - x + (sensor.range() - y.abs_diff(sensor.y)) as i32;
+        } else {
+            x += 1;
+            jumped_last = false;
+        }
+        if x > max {
+            return total;
+        }
+    }
 }
 
 pub fn part2(input: &str) -> i64 {
