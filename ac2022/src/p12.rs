@@ -131,9 +131,6 @@ pub fn part1(input: &str) -> usize {
     cost
 }
 
-#[derive(Debug, Clone)]
-struct SimplePathPoint {}
-
 pub fn part2(input: &str) -> usize {
     let (_, data) = grid(input).unwrap();
     let end = find_tile(&data, &Tile::End).unwrap();
