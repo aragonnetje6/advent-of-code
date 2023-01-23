@@ -62,11 +62,12 @@ fn process_input(input: &str) -> Vec<Rucksack> {
         .collect()
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let data = process_input(input);
     data.iter()
         .map(|rucksack| rucksack.get_duplicate().score)
-        .sum()
+        .sum::<usize>()
+        .to_string()
 }
 
 fn find_common_item(sack1: &Rucksack, sack2: &Rucksack, sack3: &Rucksack) -> Item {
@@ -82,13 +83,14 @@ fn find_common_item(sack1: &Rucksack, sack2: &Rucksack, sack3: &Rucksack) -> Ite
         .unwrap()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let data = process_input(input);
     data.iter()
         .enumerate()
         .step_by(3)
         .map(|(i, rucksack)| find_common_item(rucksack, &data[i + 1], &data[i + 2]).score)
-        .sum()
+        .sum::<usize>()
+        .to_string()
 }
 
 #[cfg(test)]
@@ -105,10 +107,10 @@ CrZsJsPPZsGzwwsLwLmpwMDw
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 157);
+        assert_eq!(part1(DATA), "157");
     }
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 70);
+        assert_eq!(part2(DATA), "70");
     }
 }

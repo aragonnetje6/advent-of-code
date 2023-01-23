@@ -73,20 +73,25 @@ fn transform_rules2(rules: &HashMap<[char; 2], char>) -> HashMap<[char; 2], Vec<
         .collect()
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let (_, (polymer, rules)) = parse_input(input).unwrap();
     let rules = transform_rules(&rules);
     let mut polymer: Vec<char> = polymer.chars().collect();
     for _ in 0..10 {
         polymer = apply_rules(&polymer, &rules);
     }
-    minmax(&frequencies(&polymer))
+    minmax(&frequencies(&polymer)).to_string()
 }
 
 fn transform_rules3(rules: &HashMap<[char; 2], Vec<char>>) -> HashMap<[char; 2], Vec<[char; 2]>> {
     rules
         .iter()
-        .map(|(chars, res)| (*chars, res.windows(2).map(|iter| [iter[0], iter[1]]).collect()))
+        .map(|(chars, res)| {
+            (
+                *chars,
+                res.windows(2).map(|iter| [iter[0], iter[1]]).collect(),
+            )
+        })
         .collect()
 }
 
@@ -133,12 +138,12 @@ fn add_to_map<T: Hash + Eq>(map: &mut HashMap<T, usize>, index: T, val: usize) {
     }
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let (_, (polymer, rules)) = parse_input(input).unwrap();
     let rules = transform_rules3(&transform_rules2(&rules));
     let polymer: Vec<char> = polymer.chars().collect();
     let frequencies = statistical_solve(&polymer, &rules, 40);
-    minmax(&frequencies) / 2 + 1
+    (minmax(&frequencies) / 2 + 1).to_string()
 }
 
 #[cfg(test)]
@@ -166,11 +171,11 @@ CN -> C
 ";
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 1588);
+        assert_eq!(part1(DATA), "1588");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 2_188_189_693_529);
+        assert_eq!(part2(DATA), "2188189693529");
     }
 }

@@ -88,7 +88,7 @@ impl CaveWall {
                     true
                 } else {
                     false
-                }
+                };
             } else if self[(x, y + 1)] == Tile::Air {
                 y += 1;
             } else if x == self.x_min {
@@ -139,7 +139,8 @@ impl From<&[Vec<Point>]> for CaveWall {
             .flatten()
             .map(|Point { y, .. }| y)
             .max()
-            .unwrap() + 1;
+            .unwrap()
+            + 1;
         let grid = vec![vec![Tile::Air; x_max - x_min + 1]; y_max - y_min + 1];
         let mut result = Self {
             grid,
@@ -191,19 +192,19 @@ impl Display for Tile {
     }
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let (_, data) = formation(input).unwrap();
     let mut wall = CaveWall::from(&*data);
     while wall.drop_sand(500, 0) {}
-    wall.count(Tile::Sand)
+    wall.count(Tile::Sand).to_string()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let (_, data) = formation(input).unwrap();
     let mut wall = CaveWall::from(&*data);
     wall.has_floor = true;
     while wall.drop_sand(500, 0) {}
-    wall.count(Tile::Sand)
+    wall.count(Tile::Sand).to_string()
 }
 
 #[cfg(test)]
@@ -216,11 +217,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 24);
+        assert_eq!(part1(DATA1), "24");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 93);
+        assert_eq!(part2(DATA1), "93");
     }
 }

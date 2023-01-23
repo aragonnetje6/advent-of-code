@@ -1,4 +1,4 @@
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     input
         .lines()
         .filter(|x| !x.is_empty())
@@ -17,9 +17,10 @@ pub fn part1(input: &str) -> usize {
                 || (elf2_low <= elf1_low && elf2_high >= elf1_high)
         })
         .count()
+        .to_string()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     input
         .lines()
         .filter(|x| !x.is_empty())
@@ -40,6 +41,7 @@ pub fn part2(input: &str) -> usize {
                 || (elf1_low <= elf2_high && elf1_high >= elf2_high)
         })
         .count()
+        .to_string()
 }
 
 #[cfg(test)]
@@ -56,10 +58,10 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 2);
+        assert_eq!(part1(DATA), "2");
     }
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 4);
+        assert_eq!(part2(DATA), "4");
     }
 }

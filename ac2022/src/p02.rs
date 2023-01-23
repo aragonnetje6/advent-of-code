@@ -15,19 +15,21 @@ enum Outcome {
     Loss = 0,
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> String {
     let data = process_input(input);
     data.iter()
         .map(|recommend| get_move_score(*recommend) + get_outcome(*recommend) as u32)
-        .sum()
+        .sum::<u32>()
+        .to_string()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let data = process_input_2(input);
     data.iter()
         .map(|x| translate(*x))
         .map(|recommend| -> u32 { get_move_score(recommend) + get_outcome(recommend) as u32 })
-        .sum()
+        .sum::<u32>()
+        .to_string()
 }
 
 fn translate(rec: Recommendation2) -> Recommendation {
@@ -108,10 +110,10 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1("A Y\nB X\nC Z\n"), 15);
+        assert_eq!(part1("A Y\nB X\nC Z\n"), "15");
     }
     #[test]
     fn test_part2() {
-        assert_eq!(part2("A Y\nB X\nC Z\n"), 12);
+        assert_eq!(part2("A Y\nB X\nC Z\n"), "12");
     }
 }

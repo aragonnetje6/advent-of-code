@@ -78,7 +78,7 @@ impl Location for Beacon {
     }
 }
 
-pub fn part1(input: &str) -> i32 {
+pub fn part1(input: &str) -> String {
     let (_, sensors) = parse_data(input).unwrap();
     let min = sensors
         .iter()
@@ -94,7 +94,7 @@ pub fn part1(input: &str) -> i32 {
     let y = 2_000_000;
     #[cfg(test)]
     let y = 10;
-    get_closed_spaces(&sensors, min, max, y)
+    get_closed_spaces(&sensors, min, max, y).to_string()
 }
 
 fn get_closed_spaces(sensors: &[Sensor], min: i32, max: i32, y: i32) -> i32 {
@@ -106,7 +106,8 @@ fn get_closed_spaces(sensors: &[Sensor], min: i32, max: i32, y: i32) -> i32 {
             .iter()
             .find(|sensor| sensor.range() >= sensor.hamming_dist(&Beacon { x, y }))
         {
-            total += i32::from(jumped_last) + sensor.x - x + (sensor.range() - y.abs_diff(sensor.y)) as i32;
+            total += i32::from(jumped_last) + sensor.x - x
+                + (sensor.range() - y.abs_diff(sensor.y)) as i32;
             jumped_last = true;
             x += 1 + sensor.x - x + (sensor.range() - y.abs_diff(sensor.y)) as i32;
         } else {
@@ -119,14 +120,14 @@ fn get_closed_spaces(sensors: &[Sensor], min: i32, max: i32, y: i32) -> i32 {
     }
 }
 
-pub fn part2(input: &str) -> i64 {
+pub fn part2(input: &str) -> String {
     let (_, sensors) = parse_data(input).unwrap();
     #[cfg(not(test))]
     let max = 4_000_000;
     #[cfg(test)]
     let max = 20;
     let (x, y) = find_gap(&sensors, max);
-    i64::from(x) * 4_000_000 + i64::from(y)
+    (i64::from(x) * 4_000_000 + i64::from(y)).to_string()
 }
 
 fn find_gap(sensors: &[Sensor], max: i32) -> (i32, i32) {
@@ -167,11 +168,11 @@ Sensor at x=20, y=1: closest beacon is at x=15, y=3
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 26);
+        assert_eq!(part1(DATA1), "26");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 56_000_011);
+        assert_eq!(part2(DATA1), "56000011");
     }
 }

@@ -65,17 +65,18 @@ fn step(octopuses: &mut Vec<Vec<u8>>) -> usize {
         .sum()
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let mut data = parse(input);
-    (0..100).map(|_| step(&mut data)).sum()
+    (0..100).map(|_| step(&mut data)).sum::<usize>().to_string()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let mut data = parse(input);
-    (0..1000)
+    ((0..1000)
         .find(|_| step(&mut data) == data.len() * data[0].len())
         .unwrap()
-        + 1
+        + 1)
+    .to_string()
 }
 
 #[cfg(test)]
@@ -96,11 +97,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 1656);
+        assert_eq!(part1(DATA), "1656");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 195);
+        assert_eq!(part2(DATA), "195");
     }
 }

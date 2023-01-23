@@ -111,17 +111,17 @@ fn process_input(input: &str) -> Vec<Line> {
         .collect()
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let data = process_input(input);
     let straight_data = data.iter().filter(|x| x.straight()).cloned().collect();
     let seabed = Seabed::new(&straight_data);
-    seabed.get_greater_than(1)
+    seabed.get_greater_than(1).to_string()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let data = process_input(input);
     let seabed = Seabed::new(&data);
-    seabed.get_greater_than(1)
+    seabed.get_greater_than(1).to_string()
 }
 
 #[cfg(test)]
@@ -141,11 +141,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 5);
+        assert_eq!(part1(DATA), "5");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 12);
+        assert_eq!(part2(DATA), "12");
     }
 }

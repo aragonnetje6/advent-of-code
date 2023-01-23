@@ -45,12 +45,13 @@ fn list_low_points(map: &Vec<Vec<u32>>) -> Vec<(usize, usize)> {
         .collect()
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> String {
     let map = parse_heightmap(input);
     list_low_points(&map)
         .iter()
         .map(|(x, y)| map[*x][*y] + 1)
-        .sum()
+        .sum::<u32>()
+        .to_string()
 }
 
 fn get_basin_size(low_point: &(usize, usize), map: &Vec<Vec<u32>>) -> usize {
@@ -77,7 +78,7 @@ fn get_basin_size(low_point: &(usize, usize), map: &Vec<Vec<u32>>) -> usize {
     checked.len()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let map = parse_heightmap(input);
     let low_points = list_low_points(&map);
     let mut basins: Vec<usize> = low_points
@@ -86,7 +87,7 @@ pub fn part2(input: &str) -> usize {
         .collect();
     basins.sort_unstable();
     basins.reverse();
-    basins.iter().take(3).copied().reduce(|x, y| x * y).unwrap()
+    basins.drain(..).take(3).product::<usize>().to_string()
 }
 
 #[cfg(test)]
@@ -101,11 +102,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 15);
+        assert_eq!(part1(DATA), "15");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 1134);
+        assert_eq!(part2(DATA), "1134");
     }
 }

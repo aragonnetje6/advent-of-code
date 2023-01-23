@@ -221,7 +221,7 @@ fn run_monkeys2(monkeys: &mut Vec<SmartMonkey>) {
     }
 }
 
-pub fn part1(input: &str) -> u128 {
+pub fn part1(input: &str) -> String {
     let (_, mut data) = monkeys(input).unwrap();
     for _ in 1..=20 {
         run_monkeys(&mut data);
@@ -232,10 +232,10 @@ pub fn part1(input: &str) -> u128 {
         .take(2)
         .map(|x| x.inspections)
         .reduce(|acc, new| acc * new)
-        .unwrap()
+        .unwrap().to_string()
 }
 
-pub fn part2(input: &str) -> u128 {
+pub fn part2(input: &str) -> String {
     let (_, data) = monkeys(input).unwrap();
     let mut smart_monkeys = SmartMonkey::from_monkeys(&data);
     for _ in 1..=10000 {
@@ -248,7 +248,7 @@ pub fn part2(input: &str) -> u128 {
         .take(2)
         .map(|x| x.inspections)
         .reduce(|acc, new| acc * new)
-        .unwrap()
+        .unwrap().to_string()
 }
 
 #[cfg(test)]
@@ -286,11 +286,11 @@ Monkey 3:
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 10605);
+        assert_eq!(part1(DATA1), "10605");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 2_713_310_158);
+        assert_eq!(part2(DATA1), "2713310158");
     }
 }

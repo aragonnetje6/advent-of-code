@@ -1,4 +1,4 @@
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> String {
     let mut occurences = vec![];
     input.lines().filter(|x| !x.is_empty()).for_each(|number| {
         number.chars().enumerate().for_each(|(i, digit)| {
@@ -30,7 +30,7 @@ pub fn part1(input: &str) -> u32 {
         2,
     )
     .unwrap();
-    epsilon * gamma
+    (epsilon * gamma).to_string()
 }
 
 fn get_digit(input: &[&str], index: usize) -> Vec<char> {
@@ -48,7 +48,7 @@ fn get_most_common(input: &[char]) -> char {
     }
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let mut ogr_data: Vec<&str> = input.lines().collect();
     let mut co2_data: Vec<&str> = input.lines().collect();
     for i in 0..input.lines().next().unwrap().len() {
@@ -63,7 +63,7 @@ pub fn part2(input: &str) -> u32 {
     }
     let ogr = u32::from_str_radix(ogr_data.first().unwrap(), 2).unwrap();
     let co2 = u32::from_str_radix(co2_data.first().unwrap(), 2).unwrap();
-    ogr * co2
+    (ogr * co2).to_string()
 }
 
 #[cfg(test)]
@@ -74,13 +74,13 @@ mod test {
     fn test_part1() {
         assert_eq!(part1(
             "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010\n"
-        ), 198);
+        ), "198");
     }
 
     #[test]
     fn test_part2() {
         assert_eq!(part2(
             "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010\n"
-        ), 230);
+        ), "230");
     }
 }

@@ -74,10 +74,10 @@ fn execute_fold(dots: &mut Vec<Point>, fold_instruction: &FoldInstruction) {
     }
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let (_, (mut dots, folds)) = parse_input(input).unwrap();
     execute_fold(&mut dots, folds.first().unwrap());
-    dots.iter().collect::<HashSet<_>>().len()
+    dots.iter().collect::<HashSet<_>>().len().to_string()
 }
 
 fn render_grid(dots: &Vec<Point>) -> String {
@@ -131,7 +131,7 @@ fold along x=5
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 17);
+        assert_eq!(part1(DATA), "17");
     }
 
     #[test]

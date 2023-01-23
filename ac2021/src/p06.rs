@@ -8,7 +8,7 @@ fn parse_input(input: &str) -> Vec<u8> {
         .collect()
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let mut data = parse_input(input);
     for _ in 0..80 {
         let zeroes = bytecount::count(&data, 0);
@@ -20,10 +20,10 @@ pub fn part1(input: &str) -> usize {
             }
         }
     }
-    data.len()
+    data.len().to_string()
 }
 
-pub fn part2(input: &str) -> u128 {
+pub fn part2(input: &str) -> String {
     let data = parse_input(input);
     let mut brackets: Vec<u128> = (0..9).map(|x| bytecount::count(&data, x) as u128).collect();
     for _ in 0..256 {
@@ -34,7 +34,7 @@ pub fn part2(input: &str) -> u128 {
         brackets[8] = zeroes;
         brackets[6] += zeroes;
     }
-    brackets.iter().sum()
+    brackets.iter().sum::<u128>().to_string()
 }
 
 #[cfg(test)]
@@ -45,11 +45,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 5934);
+        assert_eq!(part1(DATA), "5934");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 26_984_457_539);
+        assert_eq!(part2(DATA), "26984457539");
     }
 }

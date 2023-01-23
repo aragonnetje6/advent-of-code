@@ -117,7 +117,7 @@ fn find_tile(grid: &Grid, target: &Tile) -> Option<Point> {
     })
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let (_, data) = grid(input).unwrap();
     let start = find_tile(&data, &Tile::Start).unwrap();
     let end = find_tile(&data, &Tile::End).unwrap();
@@ -128,10 +128,10 @@ pub fn part1(input: &str) -> usize {
         |point| *point == end,
     )
     .unwrap();
-    cost
+    cost.to_string()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let (_, data) = grid(input).unwrap();
     let end = find_tile(&data, &Tile::End).unwrap();
     let path = pathfinding::prelude::bfs(
@@ -140,7 +140,7 @@ pub fn part2(input: &str) -> usize {
         |point| point.get_height(&data) == u32::from('a'),
     )
     .unwrap();
-    path.len() - 1
+    (path.len() - 1).to_string()
 }
 
 #[cfg(test)]
@@ -156,11 +156,11 @@ abdefghi
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 31);
+        assert_eq!(part1(DATA1), "31");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 29);
+        assert_eq!(part2(DATA1), "29");
     }
 }

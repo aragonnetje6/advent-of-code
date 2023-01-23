@@ -6,7 +6,7 @@ enum Command {
     Up(u128),
 }
 
-pub fn part1(input: &str) -> u128 {
+pub fn part1(input: &str) -> String {
     let commands: Vec<Command> = parse_commands(input);
     let mut depth = 0u128;
     let mut pos = 0u128;
@@ -17,10 +17,10 @@ pub fn part1(input: &str) -> u128 {
             Up(x) => depth -= x,
         }
     }
-    depth * pos
+    (depth * pos).to_string()
 }
 
-pub fn part2(input: &str) -> u128 {
+pub fn part2(input: &str) -> String {
     let commands: Vec<Command> = parse_commands(input);
     let mut depth = 0u128;
     let mut pos = 0u128;
@@ -35,7 +35,7 @@ pub fn part2(input: &str) -> u128 {
             Up(x) => aim -= x,
         }
     }
-    depth * pos
+    (depth * pos).to_string()
 }
 
 fn parse_commands(input: &str) -> Vec<Command> {
@@ -64,7 +64,7 @@ mod test {
     fn test_part1() {
         assert_eq!(
             part1("forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n"),
-            150
+            "150"
         );
     }
 
@@ -72,7 +72,7 @@ mod test {
     fn test_part2() {
         assert_eq!(
             part2("forward 5\ndown 5\nforward 8\nup 3\ndown 8\nforward 2\n"),
-            900
+            "900"
         );
     }
 }

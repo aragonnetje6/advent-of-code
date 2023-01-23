@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     input
         .lines()
         .map(|line| {
@@ -12,7 +12,7 @@ pub fn part1(input: &str) -> usize {
                 .filter(|len| [2, 3, 4, 7].contains(len))
                 .count()
         })
-        .sum()
+        .sum::<usize>().to_string()
 }
 
 fn parse_input(input: &str) -> Vec<(Vec<&str>, Vec<&str>)> {
@@ -148,11 +148,11 @@ fn decode(input: &[&str], output: &[&str]) -> u32 {
         .unwrap()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let data = parse_input(input);
     data.iter()
         .map(|(input, output)| decode(input, output))
-        .sum()
+        .sum::<u32>().to_string()
 }
 
 #[cfg(test)]
@@ -174,13 +174,13 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
         r"acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf";
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA2), 0);
-        assert_eq!(part1(DATA1), 26);
+        assert_eq!(part1(DATA2), "0");
+        assert_eq!(part1(DATA1), "26");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA2), 5353);
-        assert_eq!(part2(DATA1), 61229);
+        assert_eq!(part2(DATA2), "5353");
+        assert_eq!(part2(DATA1), "61229");
     }
 }

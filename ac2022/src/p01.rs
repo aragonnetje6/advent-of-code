@@ -1,5 +1,5 @@
-pub fn part1(input: &str) -> u32 {
-    *process_input(input).iter().max().unwrap()
+pub fn part1(input: &str) -> String {
+    process_input(input).iter().max().unwrap().to_string()
 }
 
 fn process_input(input: &str) -> Vec<u32> {
@@ -14,10 +14,10 @@ fn process_input(input: &str) -> Vec<u32> {
         .collect()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let mut sums: Vec<u32> = process_input(input);
     sums.sort_unstable();
-    sums.iter().rev().take(3).sum()
+    sums.iter().rev().take(3).sum::<u32>().to_string()
 }
 
 #[cfg(test)]
@@ -40,10 +40,10 @@ mod test {
 10000";
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 24000);
+        assert_eq!(part1(DATA), "24000");
     }
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 45000);
+        assert_eq!(part2(DATA), "45000");
     }
 }

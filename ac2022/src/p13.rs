@@ -66,21 +66,21 @@ impl Display for Packet {
     }
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     parse_signal(input)
         .unwrap()
         .1
         .iter()
         .enumerate()
         .filter_map(|(i, (left, right))| if left <= right { Some(i + 1) } else { None })
-        .sum()
+        .sum::<usize>().to_string()
 }
 
 fn transform_data(mut data: Vec<PacketPair>) -> Vec<Packet> {
     data.drain(..).flat_map(|(p1, p2)| [p1, p2]).collect()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let mut signal = transform_data(parse_signal(input).unwrap().1);
     let divs = vec![packet("[[2]]").unwrap().1, packet("[[6]]").unwrap().1];
     signal.append(&mut divs.clone());
@@ -93,7 +93,7 @@ pub fn part2(input: &str) -> usize {
                 .find_map(|(i, x)| if x == div { Some(i + 1) } else { None })
                 .unwrap()
         })
-        .product()
+        .product::<usize>().to_string()
 }
 
 #[cfg(test)]
@@ -126,11 +126,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 13);
+        assert_eq!(part1(DATA1), "13");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 140);
+        assert_eq!(part2(DATA1), "140");
     }
 }

@@ -146,7 +146,7 @@ fn get_file_tree(commands: &[Command]) -> FsObject {
     tree
 }
 
-pub fn part1(input: &str) -> u64 {
+pub fn part1(input: &str) -> String {
     let (_, data) = commands(input).unwrap();
     let tree = get_file_tree(&data);
 
@@ -154,10 +154,11 @@ pub fn part1(input: &str) -> u64 {
         .iter()
         .map(|x| x.get_size())
         .filter(|x| *x <= 100_000)
-        .sum()
+        .sum::<u64>()
+        .to_string()
 }
 
-pub fn part2(input: &str) -> u64 {
+pub fn part2(input: &str) -> String {
     let (_, data) = commands(input).unwrap();
     let tree = get_file_tree(&data);
     let must_clean = 30_000_000 - (70_000_000 - tree.get_size());
@@ -168,6 +169,7 @@ pub fn part2(input: &str) -> u64 {
         .filter(|x| *x >= must_clean)
         .min()
         .unwrap()
+        .to_string()
 }
 
 #[cfg(test)]
@@ -200,11 +202,11 @@ $ ls
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 95437);
+        assert_eq!(part1(DATA1), "95437");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 24_933_642);
+        assert_eq!(part2(DATA1), "24933642");
     }
 }

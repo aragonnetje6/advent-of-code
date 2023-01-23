@@ -62,12 +62,13 @@ fn mark_visible(trees: &[Vec<u8>]) -> Vec<Vec<bool>> {
     visible
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let data = parse(input);
     mark_visible(&data)
         .iter()
         .map(|line| line.iter().filter(|x| **x).count())
-        .sum()
+        .sum::<usize>()
+        .to_string()
 }
 
 fn get_view_from(trees: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
@@ -100,7 +101,7 @@ fn get_view_from(trees: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
     result
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let data = parse(input);
     data.iter()
         .enumerate()
@@ -117,6 +118,7 @@ pub fn part2(input: &str) -> usize {
         })
         .max()
         .unwrap()
+        .to_string()
 }
 
 #[cfg(test)]
@@ -132,11 +134,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 21);
+        assert_eq!(part1(DATA1), "21");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 8);
+        assert_eq!(part2(DATA1), "8");
     }
 }

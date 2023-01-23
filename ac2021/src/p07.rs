@@ -33,19 +33,19 @@ fn linear_cost(current: u32, target: u32) -> u32 {
     current.abs_diff(target)
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> String {
     let data = parse_input(input);
-    min_alignment_cost(&data, &linear_cost)
+    min_alignment_cost(&data, &linear_cost).to_string()
 }
 
 fn incrementing_cost(current: u32, target: u32) -> u32 {
     let dist = current.abs_diff(target);
-    dist * (dist+1) / 2
+    dist * (dist + 1) / 2
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let data = parse_input(input);
-    min_alignment_cost(&data, &incrementing_cost)
+    min_alignment_cost(&data, &incrementing_cost).to_string()
 }
 
 #[cfg(test)]
@@ -56,11 +56,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 37);
+        assert_eq!(part1(DATA), "37");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 168);
+        assert_eq!(part2(DATA), "168");
     }
 }

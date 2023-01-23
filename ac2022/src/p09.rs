@@ -87,7 +87,8 @@ impl Path {
 
     fn move_knot(&mut self, index: usize) {
         if (self.knots[index - 1].0.abs_diff(self.knots[index].0) == 2)
-            && (self.knots[index - 1].1.abs_diff(self.knots[index].1) == 2) {
+            && (self.knots[index - 1].1.abs_diff(self.knots[index].1) == 2)
+        {
             self.knots[index].0 = (self.knots[index].0 + self.knots[index - 1].0) / 2;
             self.knots[index].1 = (self.knots[index].1 + self.knots[index - 1].1) / 2;
         } else if self.knots[index - 1].0.abs_diff(self.knots[index].0) == 2 {
@@ -104,22 +105,22 @@ impl Path {
     }
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let (_, data) = motions(input).unwrap();
     let mut path = Path::new(2);
     for motion in data {
         path.execute_motion(motion);
     }
-    path.get_tail_visited_points().len()
+    path.get_tail_visited_points().len().to_string()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let (_, data) = motions(input).unwrap();
     let mut path = Path::new(10);
     for motion in data {
         path.execute_motion(motion);
     }
-    path.get_tail_visited_points().len()
+    path.get_tail_visited_points().len().to_string()
 }
 
 #[cfg(test)]
@@ -147,12 +148,12 @@ U 20
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 13);
+        assert_eq!(part1(DATA1), "13");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 1);
-        assert_eq!(part2(DATA2), 36);
+        assert_eq!(part2(DATA1), "1");
+        assert_eq!(part2(DATA2), "36");
     }
 }

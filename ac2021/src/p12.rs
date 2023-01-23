@@ -134,18 +134,18 @@ fn list_paths<F: Fn(&[Node]) -> bool + Clone>(
         .collect()
 }
 
-pub fn part1(input: &str) -> usize {
+pub fn part1(input: &str) -> String {
     let (_, data) = parse_network(input).unwrap();
     let map = network_map(&data);
     let paths = list_paths(&map, &[Node::Start], valid_partial_path_1);
-    paths.len()
+    paths.len().to_string()
 }
 
-pub fn part2(input: &str) -> usize {
+pub fn part2(input: &str) -> String {
     let (_, data) = parse_network(input).unwrap();
     let map = network_map(&data);
     let paths = list_paths(&map, &[Node::Start], valid_partial_path_2);
-    paths.len()
+    paths.len().to_string()
 }
 
 #[cfg(test)]
@@ -194,15 +194,15 @@ start-RW
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 10);
-        assert_eq!(part1(DATA2), 19);
-        assert_eq!(part1(DATA3), 226);
+        assert_eq!(part1(DATA1), "10");
+        assert_eq!(part1(DATA2), "19");
+        assert_eq!(part1(DATA3), "226");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 36);
-        assert_eq!(part2(DATA2), 103);
-        assert_eq!(part2(DATA3), 3509);
+        assert_eq!(part2(DATA1), "36");
+        assert_eq!(part2(DATA2), "103");
+        assert_eq!(part2(DATA3), "3509");
     }
 }

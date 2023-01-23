@@ -14,37 +14,29 @@ mod p11;
 mod p12;
 mod p13;
 mod p14;
-mod p15;
+
+type Solution = fn(&str) -> String;
 
 fn main() {
-    wrapper(2021, 1, 1, p01::part1);
-    wrapper(2021, 1, 2, p01::part2);
-    wrapper(2021, 2, 1, p02::part1);
-    wrapper(2021, 2, 2, p02::part2);
-    wrapper(2021, 3, 1, p03::part1);
-    wrapper(2021, 3, 2, p03::part2);
-    wrapper(2021, 4, 1, p04::part1);
-    wrapper(2021, 4, 2, p04::part2);
-    wrapper(2021, 5, 1, p05::part1);
-    wrapper(2021, 5, 2, p05::part2);
-    wrapper(2021, 6, 1, p06::part1);
-    wrapper(2021, 6, 2, p06::part2);
-    wrapper(2021, 7, 1, p07::part1);
-    wrapper(2021, 7, 2, p07::part2);
-    wrapper(2021, 8, 1, p08::part1);
-    wrapper(2021, 8, 2, p08::part2);
-    wrapper(2021, 9, 1, p09::part1);
-    wrapper(2021, 9, 2, p09::part2);
-    wrapper(2021, 10, 1, p10::part1);
-    wrapper(2021, 10, 2, p10::part2);
-    wrapper(2021, 11, 1, p11::part1);
-    wrapper(2021, 11, 2, p11::part2);
-    wrapper(2021, 12, 1, p12::part1);
-    wrapper(2021, 12, 2, p12::part2);
-    wrapper(2021, 13, 1, p13::part1);
-    wrapper(2021, 13, 2, p13::part2);
-    wrapper(2021, 14, 1, p14::part1);
-    wrapper(2021, 14, 2, p14::part2);
-    // wrapper(2021, 15, 1, p15::part1);
-    // wrapper(2021, 15, 2, p15::part2);
+    let year = 2021;
+    let functions: Vec<(Solution, Solution)> = vec![
+        (p01::part1, p01::part2),
+        (p02::part1, p02::part2),
+        (p03::part1, p03::part2),
+        (p04::part1, p04::part2),
+        (p05::part1, p05::part2),
+        (p06::part1, p06::part2),
+        (p07::part1, p07::part2),
+        (p08::part1, p08::part2),
+        (p09::part1, p09::part2),
+        (p10::part1, p10::part2),
+        (p11::part1, p11::part2),
+        (p12::part1, p12::part2),
+        (p13::part1, p13::part2),
+        (p14::part1, p14::part2),
+    ];
+    for (index, (part1, part2)) in functions.iter().enumerate() {
+        wrapper(year, index + 1, 1, part1);
+        wrapper(year, index + 1, 2, part2);
+    }
 }

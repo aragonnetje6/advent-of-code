@@ -76,18 +76,18 @@ fn parse_input(input: &str) -> (Vec<u8>, Vec<Bingo>) {
     (nums, bingos)
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> String {
     let (nums, mut bingos) = parse_input(input);
     for num in nums {
         bingos.iter_mut().for_each(|bingo| bingo.check(num));
         if let Some(winner) = bingos.iter().find(|x| x.has_won()) {
-            return winner.score() * u32::from(num);
+            return (winner.score() * u32::from(num)).to_string();
         }
     }
     unreachable!()
 }
 
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &str) -> String {
     let (nums, mut bingos) = parse_input(input);
     let mut nums_iter = nums.iter();
     while bingos.iter().filter(|x| !x.has_won()).count() > 1 {
@@ -102,7 +102,7 @@ pub fn part2(input: &str) -> u32 {
     for num in nums_iter {
         last.check(*num);
         if last.has_won() {
-            return last.score() * u32::from(*num);
+            return (last.score() * u32::from(*num)).to_string();
         }
     }
     unreachable!()
@@ -134,11 +134,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 4512);
+        assert_eq!(part1(DATA), "4512");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 1924);
+        assert_eq!(part2(DATA), "1924");
     }
 }

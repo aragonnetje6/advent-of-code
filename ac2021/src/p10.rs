@@ -44,7 +44,7 @@ const fn corrupt_score(c: char) -> u32 {
     }
 }
 
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &str) -> String {
     input
         .lines()
         .map(|line| {
@@ -54,7 +54,8 @@ pub fn part1(input: &str) -> u32 {
                 0
             }
         })
-        .sum()
+        .sum::<u32>()
+        .to_string()
 }
 
 const fn incomplete_score(c: char) -> u64 {
@@ -67,7 +68,7 @@ const fn incomplete_score(c: char) -> u64 {
     }
 }
 
-pub fn part2(input: &str) -> u64 {
+pub fn part2(input: &str) -> String {
     let mut scored = input
         .lines()
         .filter_map(|line| {
@@ -85,7 +86,7 @@ pub fn part2(input: &str) -> u64 {
         })
         .collect::<Vec<u64>>();
     scored.sort_unstable();
-    scored[scored.len() / 2]
+    scored[scored.len() / 2].to_string()
 }
 
 #[cfg(test)]
@@ -106,11 +107,11 @@ mod test {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA), 26397);
+        assert_eq!(part1(DATA), "26397");
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA), 288_957);
+        assert_eq!(part2(DATA), "288957");
     }
 }

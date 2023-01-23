@@ -88,11 +88,11 @@ impl Cpu {
     }
 }
 
-pub fn part1(input: &str) -> i32 {
+pub fn part1(input: &str) -> String {
     let (_, data) = instructions(input).unwrap();
     let mut cpu = Cpu::new(data);
     while cpu.cycle() {}
-    cpu.strengths.iter().sum()
+    cpu.strengths.iter().sum::<i32>().to_string()
 }
 
 pub fn part2(input: &str) -> String {
@@ -262,7 +262,7 @@ noop
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(DATA1), 13140);
+        assert_eq!(part1(DATA1), "13140");
     }
 
     #[test]
