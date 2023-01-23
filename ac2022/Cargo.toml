@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 lib = { path = "./../lib"}
 nom = "^7.1.1"
+pathfinding = { version = "^4.2.1" }
