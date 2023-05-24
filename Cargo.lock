@@ -66,6 +66,9 @@ dependencies = [
 [[package]]
 name = "lib"
 version = "0.1.0"
+dependencies = [
+ "paste",
+]
 
 [[package]]
 name = "memchr"
@@ -97,6 +100,12 @@ checksum = "578ede34cf02f8924ab9447f50c28075b4d3e5b269972345e7e0372b38c6cdcd"
 dependencies = [
  "autocfg",
 ]
+
+[[package]]
+name = "paste"
+version = "1.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f746c4065a8fa3fe23974dd82f15431cc8d40779821001404d10d2e79ca7d79"
 
 [[package]]
 name = "pathfinding"

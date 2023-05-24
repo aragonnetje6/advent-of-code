@@ -73,7 +73,8 @@ pub fn part1(input: &str) -> String {
         .iter()
         .enumerate()
         .filter_map(|(i, (left, right))| if left <= right { Some(i + 1) } else { None })
-        .sum::<usize>().to_string()
+        .sum::<usize>()
+        .to_string()
 }
 
 fn transform_data(mut data: Vec<PacketPair>) -> Vec<Packet> {
@@ -93,7 +94,8 @@ pub fn part2(input: &str) -> String {
                 .find_map(|(i, x)| if x == div { Some(i + 1) } else { None })
                 .unwrap()
         })
-        .product::<usize>().to_string()
+        .product::<usize>()
+        .to_string()
 }
 
 #[cfg(test)]

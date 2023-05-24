@@ -3,12 +3,12 @@ pub fn part1(input: &str) -> String {
         .split('\n')
         .filter_map(|x| str::parse::<u32>(x).ok())
         .collect();
-    data
-        .iter()
+    data.iter()
         .skip(1)
         .zip(data.iter())
         .filter(|(later, earlier)| later > earlier)
-        .count().to_string()
+        .count()
+        .to_string()
 }
 
 pub fn part2(input: &str) -> String {
@@ -16,12 +16,12 @@ pub fn part2(input: &str) -> String {
         .split('\n')
         .filter_map(|x| str::parse::<u32>(x).ok())
         .collect();
-    data
-        .iter()
+    data.iter()
         .skip(3)
         .zip(data.iter())
         .filter(|(later, earlier)| later > earlier)
-        .count().to_string()
+        .count()
+        .to_string()
 }
 
 #[cfg(test)]

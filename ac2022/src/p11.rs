@@ -232,7 +232,8 @@ pub fn part1(input: &str) -> String {
         .take(2)
         .map(|x| x.inspections)
         .reduce(|acc, new| acc * new)
-        .unwrap().to_string()
+        .unwrap()
+        .to_string()
 }
 
 pub fn part2(input: &str) -> String {
@@ -248,7 +249,8 @@ pub fn part2(input: &str) -> String {
         .take(2)
         .map(|x| x.inspections)
         .reduce(|acc, new| acc * new)
-        .unwrap().to_string()
+        .unwrap()
+        .to_string()
 }
 
 #[cfg(test)]

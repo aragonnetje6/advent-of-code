@@ -12,7 +12,8 @@ pub fn part1(input: &str) -> String {
                 .filter(|len| [2, 3, 4, 7].contains(len))
                 .count()
         })
-        .sum::<usize>().to_string()
+        .sum::<usize>()
+        .to_string()
 }
 
 fn parse_input(input: &str) -> Vec<(Vec<&str>, Vec<&str>)> {
@@ -152,7 +153,8 @@ pub fn part2(input: &str) -> String {
     let data = parse_input(input);
     data.iter()
         .map(|(input, output)| decode(input, output))
-        .sum::<u32>().to_string()
+        .sum::<u32>()
+        .to_string()
 }
 
 #[cfg(test)]

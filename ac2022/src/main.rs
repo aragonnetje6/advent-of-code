@@ -1,6 +1,6 @@
 extern crate core;
 
-use lib::wrapper;
+use lib::solution;
 
 mod p01;
 mod p02;
@@ -19,29 +19,38 @@ mod p14;
 mod p15;
 // mod p16;
 
-type Solution = fn(&str) -> String;
-
+#[allow(clippy::zero_prefixed_literal)]
 fn main() {
-    let year = 2022;
-    let functions: Vec<(Solution, Solution)> = vec![
-        (p01::part1, p01::part2),
-        (p02::part1, p02::part2),
-        (p03::part1, p03::part2),
-        (p04::part1, p04::part2),
-        (p05::part1, p05::part2),
-        (p06::part1, p06::part2),
-        (p07::part1, p07::part2),
-        (p08::part1, p08::part2),
-        (p09::part1, p09::part2),
-        (p10::part1, p10::part2),
-        (p11::part1, p11::part2),
-        (p12::part1, p12::part2),
-        (p13::part1, p13::part2),
-        (p14::part1, p14::part2),
-        (p15::part1, p15::part2),
-    ];
-    for (index, (part1, part2)) in functions.iter().enumerate() {
-        wrapper(year, index + 1, 1, part1);
-        wrapper(year, index + 1, 2, part2);
-    }
+    solution!(01, 1);
+    solution!(01, 2);
+    solution!(02, 1);
+    solution!(02, 2);
+    solution!(03, 1);
+    solution!(03, 2);
+    solution!(04, 1);
+    solution!(04, 2);
+    solution!(05, 1);
+    solution!(05, 2);
+    solution!(06, 1);
+    solution!(06, 2);
+    solution!(07, 1);
+    solution!(07, 2);
+    solution!(08, 1);
+    solution!(08, 2);
+    solution!(09, 1);
+    solution!(09, 2);
+    solution!(10, 1);
+    solution!(10, 2);
+    solution!(11, 1);
+    solution!(11, 2);
+    solution!(12, 1);
+    solution!(12, 2);
+    solution!(13, 1);
+    solution!(13, 2);
+    solution!(14, 1);
+    solution!(14, 2);
+    solution!(15, 1);
+    solution!(15, 2);
+    // solution!(16, 1);
+    // solution!(11, 2);
 }

@@ -1,22 +1,27 @@
-use std::fmt::Display;
-use std::fs;
+pub use paste::paste;
 
-/// Wrapper of Advent of Code challenges
-///
-/// # Arguments
-///
-/// * `year`:
-/// * `index`:
-/// * `part`:
-/// * `func`:
-///
-/// returns: ()
-///
-/// # Panics
-/// If no input file is present
-pub fn wrapper<F: FnOnce(&str) -> T, T: Display>(year: u16, index: usize, part: u8, func: F) {
-    println!(
-        "Day {index} part {part}: {}",
-        func(&fs::read_to_string(format!("./ac{year}/input/p{index:0>2}")).unwrap())
-    );
+#[macro_export]
+macro_rules! solution {
+    ( $day:literal, 1 ) => {{
+        use lib::paste;
+        paste! {
+            use [<p $day>] as p;
+            println!(
+                "Day {} part 1: {}",
+                $day,
+                p::part1(include_str!(concat!("../input/p", stringify!($day))))
+            )
+        }
+    }};
+    ( $day:literal, 2 ) => {{
+        use lib::paste;
+        paste! {
+            use [<p $day>] as p;
+            println!(
+                "Day {} part 2: {}",
+                $day,
+                p::part2(include_str!(concat!("../input/p", stringify!($day))))
+            )
+        }
+    }};
 }
