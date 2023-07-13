@@ -2,14 +2,16 @@ use std::collections::HashMap;
 
 use nom::{
     branch::alt,
-    nom::bytes::complete::{tag, take},
-    nom::character::complete::newline,
-    nom::combinator::map,
-    nom::multi::separated_list1,
-    nom::sequence::preceded,
-    nom::IResult,
+    bytes::complete::{tag, take},
+    character::complete::newline,
+    combinator::map,
+    multi::separated_list1,
+    sequence::preceded,
+    IResult,
 };
 use pathfinding::prelude::dijkstra_all;
+
+type Path = Vec<String>;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 struct Valve {
@@ -57,7 +59,7 @@ fn cave_system(input: &str) -> IResult<&str, HashMap<String, Valve>> {
     })(input)
 }
 
-fn relative_valve_costs(valves: &HashMap<String, Valve>) -> HashMap<Valve, HashMap<Valve, u32>> {
+fn relative_valve_costs(valves: &HashMap<String, Valve>) -> HashMap<Valve, HashMap<String, u32>> {
     valves
         .iter()
         .filter(|(_, valve)| valve.flow_rate > 0 || valve.name == "AA")
@@ -68,7 +70,7 @@ fn relative_valve_costs(valves: &HashMap<String, Valve>) -> HashMap<Valve, HashM
                     .iter()
                     .filter_map(|(valve, (_, cost))| {
                         if valve.flow_rate > 0 || valve.name == "AA" {
-                            Some((valve.clone(), *cost + 1))
+                            Some((valve.name.clone(), *cost + 1))
                         } else {
                             None
                         }
@@ -79,49 +81,64 @@ fn relative_valve_costs(valves: &HashMap<String, Valve>) -> HashMap<Valve, HashM
         .collect()
 }
 
-fn optimal_valve_order(valves: &HashMap<Valve, HashMap<Valve, u32>>) -> (Vec<Valve>, u32) {
-    let path = vec![valves.keys().find(|v| v.name == "AA").unwrap().clone()];
-    best_move_given(valves, &path, 30, 0)
+fn find_valve(network: &HashMap<Valve, HashMap<String, u32>>, valve_name: &str) -> Valve {
+    network
+        .iter()
+        .find(|(v, _)| v.name == *valve_name)
+        .expect("guaranteed success")
+        .0
+        .clone()
 }
 
-fn best_move_given(
-    valves: &HashMap<Valve, HashMap<Valve, u32>>,
-    path: &[Valve],
-    time_remaining: u32,
-    flow_so_far: u32,
-) -> (Vec<Valve>, u32) {
-    let current_valve = path.last().unwrap();
-    let current_rate: u32 = path.iter().map(|x| x.flow_rate).sum();
-    dbg!(current_valve);
-    valves[current_valve]
-        .iter()
-        .inspect(|x| {
-            dbg!(&x.0.name);
-        })
-        .filter(|(destination, &cost)| !path.contains(destination) && time_remaining >= cost)
-        .inspect(|x| {
-            dbg!(&x.0.name);
-        })
-        .map(|(destination, cost)| {
-            let mut new_path = path.to_vec();
-            new_path.push(destination.clone());
-            best_move_given(
-                valves,
-                &new_path,
-                time_remaining - cost,
-                flow_so_far + cost * current_rate,
-            )
-        })
-        .max_by_key(|(_, flow)| *flow)
-        .unwrap_or((path.to_vec(), flow_so_far))
+fn evaluate_path(
+    path: &[String],
+    network: &HashMap<Valve, HashMap<String, u32>>,
+    remaining_time: u32,
+) -> u32 {
+    if path.is_empty() {
+        0
+    } else if path.len() == 1 {
+        find_valve(network, &path[0]).flow_rate * remaining_time
+    } else {
+        let (first, rest) = path.split_first().expect("guaranteed by checks");
+        let valve = find_valve(network, first);
+        valve.flow_rate * remaining_time
+            + evaluate_path(rest, network, remaining_time - network[&valve][&rest[0]])
+    }
+}
+
+fn optimal_valve_order(network: &HashMap<Valve, HashMap<String, u32>>) -> (Vec<String>, u32) {
+    all_paths_starting_at(network, 30, &vec!["AA".to_string()])
+        .into_iter()
+        .map(|path| (path.clone(), evaluate_path(&path, network, 30)))
+        .max_by_key(|(_, score)| *score)
+        .unwrap()
+}
+
+fn all_paths_starting_at(
+    network: &HashMap<Valve, HashMap<String, u32>>,
+    remaining_time: u32,
+    path: &Path,
+) -> Vec<Path> {
+    let valve = find_valve(network, path.last().expect("empty path"));
+    let mut out = vec![path.clone()];
+    out.extend(
+        network[&valve]
+            .iter()
+            .filter(|(valve2_name, dist)| **dist <= remaining_time && !path.contains(*valve2_name))
+            .flat_map(|(valve2_name, dist)| {
+                let mut new_path = path.clone();
+                new_path.push(valve2_name.clone());
+                all_paths_starting_at(network, remaining_time - dist, &new_path)
+            }),
+    );
+    out
 }
 
 pub fn part1(input: &str) -> String {
     let (_, data) = cave_system(input).unwrap();
     let useful_valve_paths = relative_valve_costs(&data);
-    let (path, flow) = optimal_valve_order(&useful_valve_paths);
-    dbg!(path.iter().map(|x| &x.name).collect::<Vec<_>>());
-    dbg!(flow);
+    let (_, flow) = optimal_valve_order(&useful_valve_paths);
     flow.to_string()
 }
 
