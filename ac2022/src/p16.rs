@@ -107,12 +107,12 @@ fn evaluate_path(
     }
 }
 
-fn optimal_valve_order(network: &HashMap<Valve, HashMap<String, u32>>) -> (Vec<String>, u32) {
+fn optimal_path(network: &HashMap<Valve, HashMap<String, u32>>) -> (Path, u32) {
     all_paths_starting_at(network, 30, &vec!["AA".to_string()])
         .into_iter()
         .map(|path| (path.clone(), evaluate_path(&path, network, 30)))
         .max_by_key(|(_, score)| *score)
-        .unwrap()
+        .expect("no paths found")
 }
 
 fn all_paths_starting_at(
@@ -138,12 +138,40 @@ fn all_paths_starting_at(
 pub fn part1(input: &str) -> String {
     let (_, data) = cave_system(input).unwrap();
     let useful_valve_paths = relative_valve_costs(&data);
-    let (_, flow) = optimal_valve_order(&useful_valve_paths);
+    let (_, flow) = optimal_path(&useful_valve_paths);
     flow.to_string()
 }
 
+fn optimal_path_pair(network: &HashMap<Valve, HashMap<String, u32>>) -> (Path, Path, u32) {
+    let paths = all_paths_starting_at(network, 26, &vec!["AA".to_string()]);
+    let scored_paths: Vec<(Path, u32)> = paths
+        .into_iter()
+        .map(|x| {
+            let score = evaluate_path(&x, network, 26);
+            (x, score)
+        })
+        .collect();
+    scored_paths
+        .iter()
+        .flat_map(|(path1, score1)| {
+            scored_paths
+                .iter()
+                .filter(|(path2, _)| no_overlap(&path1[1..], &path2[1..]))
+                .map(|(path2, score2)| (path1.clone(), path2.clone(), *score1 + *score2))
+        })
+        .max_by_key(|(_, _, score)| *score)
+        .expect("no paths found")
+}
+
+fn no_overlap<T: Eq>(path1: &[T], path2: &[T]) -> bool {
+    path1.iter().all(|x| !path2.contains(x))
+}
+
 pub fn part2(input: &str) -> String {
-    todo!()
+    let (_, data) = cave_system(input).unwrap();
+    let useful_valve_paths = relative_valve_costs(&data);
+    let (_, _, flow) = optimal_path_pair(&useful_valve_paths);
+    flow.to_string()
 }
 
 #[cfg(test)]
@@ -168,8 +196,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA1), "56000011");
+        assert_eq!(part2(DATA1), "1707");
     }
 }
