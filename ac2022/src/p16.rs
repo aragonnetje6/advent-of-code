@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+};
 
 use nom::{
     branch::alt,
@@ -142,35 +145,47 @@ pub fn part1(input: &str) -> String {
     flow.to_string()
 }
 
-fn optimal_path_pair(network: &HashMap<Valve, HashMap<String, u32>>) -> (Path, Path, u32) {
+fn optimal_path_pair(network: &HashMap<Valve, HashMap<String, u32>>) -> u32 {
     let paths = all_paths_starting_at(network, 26, &vec!["AA".to_string()]);
-    let scored_paths: Vec<(Path, u32)> = paths
+    let mut scored_paths: Vec<(HashSet<String>, u32)> = paths
         .into_iter()
         .map(|x| {
             let score = evaluate_path(&x, network, 26);
-            (x, score)
+            (x.into_iter().skip(1).collect(), score)
         })
         .collect();
-    scored_paths
-        .iter()
-        .flat_map(|(path1, score1)| {
-            scored_paths
-                .iter()
-                .filter(|(path2, _)| no_overlap(&path1[1..], &path2[1..]))
-                .map(|(path2, score2)| (path1.clone(), path2.clone(), *score1 + *score2))
-        })
-        .max_by_key(|(_, _, score)| *score)
-        .expect("no paths found")
+    scored_paths.sort_by_key(|(_, score)| *score);
+    scored_paths.reverse();
+    let max_score = scored_paths.first().expect("no paths found").1;
+    let mut max = 0;
+    for (path1, score1) in &scored_paths {
+        if score1 + max_score < max {
+            break;
+        }
+        if let Some(x) = scored_paths
+            .iter()
+            .map(|(path, score2)| (path, score1 + *score2))
+            .take_while(|(_, score)| *score > max)
+            .filter(move |(path2, _)| no_overlap(path1, path2))
+            .map(|(_, score)| score)
+            .max()
+        {
+            if x > max {
+                max = x;
+            }
+        }
+    }
+    max
 }
 
-fn no_overlap<T: Eq>(path1: &[T], path2: &[T]) -> bool {
-    path1.iter().all(|x| !path2.contains(x))
+fn no_overlap<T: Eq + Hash>(path1: &HashSet<T>, path2: &HashSet<T>) -> bool {
+    path1.is_disjoint(path2)
 }
 
 pub fn part2(input: &str) -> String {
     let (_, data) = cave_system(input).unwrap();
     let useful_valve_paths = relative_valve_costs(&data);
-    let (_, _, flow) = optimal_path_pair(&useful_valve_paths);
+    let flow = optimal_path_pair(&useful_valve_paths);
     flow.to_string()
 }
 
