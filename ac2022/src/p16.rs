@@ -21,7 +21,7 @@ struct Valve {
 }
 
 impl Valve {
-    fn successors(&self, valves: &HashMap<String, Valve>) -> Vec<(Valve, u32)> {
+    fn successors(&self, valves: &HashMap<String, Self>) -> Vec<(Self, u32)> {
         self.tunnels
             .iter()
             .map(|name| (valves[name].clone(), 1))
@@ -51,9 +51,9 @@ fn valve(input: &str) -> IResult<&str, Valve> {
 }
 
 fn cave_system(input: &str) -> IResult<&str, HashMap<String, Valve>> {
-    map(separated_list1(newline, valve), |mut valves| {
+    map(separated_list1(newline, valve), |valves| {
         valves
-            .drain(..)
+            .into_iter()
             .map(|valve| (valve.name.clone(), valve))
             .collect()
     })(input)

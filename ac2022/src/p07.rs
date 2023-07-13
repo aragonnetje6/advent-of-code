@@ -19,7 +19,7 @@ impl FsObject {
         }
     }
 
-    fn add(&mut self, path: &[&str], entries: &Vec<FsObject>) -> Result<(), String> {
+    fn add(&mut self, path: &[&str], entries: &Vec<Self>) -> Result<(), String> {
         match self {
             Self::Dir { name, items } => {
                 if path.first().unwrap() != name {
@@ -48,7 +48,7 @@ impl FsObject {
         match self {
             Self::File { .. } => vec![],
             Self::Dir { items, .. } => {
-                let mut result: Vec<&FsObject> = items.iter().flat_map(Self::list_dirs).collect();
+                let mut result: Vec<&Self> = items.iter().flat_map(Self::list_dirs).collect();
                 result.push(self);
                 result
             }

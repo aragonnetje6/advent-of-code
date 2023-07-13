@@ -32,7 +32,7 @@ pub fn part2(input: &str) -> String {
         .to_string()
 }
 
-fn translate(rec: Recommendation2) -> Recommendation {
+const fn translate(rec: Recommendation2) -> Recommendation {
     match rec.1 {
         Outcome::Win => (rec.0, defeats(rec.0)),
         Outcome::Draw => (rec.0, rec.0),

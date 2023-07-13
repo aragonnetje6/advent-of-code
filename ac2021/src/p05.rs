@@ -20,7 +20,7 @@ impl FromStr for Point {
 }
 
 impl Point {
-    fn same_axis(&self, other: &Point) -> bool {
+    const fn same_axis(&self, other: &Self) -> bool {
         self.x == other.x || self.y == other.y
     }
 }
@@ -44,7 +44,7 @@ impl FromStr for Line {
 }
 
 impl Line {
-    fn straight(&self) -> bool {
+    const fn straight(&self) -> bool {
         self.start.same_axis(&self.end)
     }
 

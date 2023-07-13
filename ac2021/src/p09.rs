@@ -87,7 +87,7 @@ pub fn part2(input: &str) -> String {
         .collect();
     basins.sort_unstable();
     basins.reverse();
-    basins.drain(..).take(3).product::<usize>().to_string()
+    basins.into_iter().take(3).product::<usize>().to_string()
 }
 
 #[cfg(test)]

@@ -26,16 +26,17 @@ fn rules(input: &str) -> IResult<&str, Vec<([char; 2], char)>> {
 fn parse_input(input: &str) -> IResult<&str, (&str, HashMap<[char; 2], char>)> {
     let (input, polymer) = alpha1(input)?;
     let (input, _) = count(newline, 2)(input)?;
-    let (input, mut rules) = rules(input)?;
-    Ok((input, (polymer, rules.drain(..).collect())))
+    let (input, rules) = rules(input)?;
+    Ok((input, (polymer, rules.into_iter().collect())))
 }
 
 fn apply_rules(polymer: &[char], rules: &HashMap<[char; 2], Vec<char>>) -> Vec<char> {
     polymer
         .windows(2)
-        .flat_map(|chars| match rules.get(chars) {
-            None => vec![chars[0]],
-            Some(x) => x.clone(),
+        .flat_map(|chars| {
+            rules
+                .get(chars)
+                .map_or_else(|| vec![chars[0]], std::clone::Clone::clone)
         })
         .chain([*polymer.last().unwrap()])
         .collect()
@@ -44,12 +45,7 @@ fn apply_rules(polymer: &[char], rules: &HashMap<[char; 2], Vec<char>>) -> Vec<c
 fn frequencies(polymer: &[char]) -> HashMap<char, usize> {
     let mut freq = HashMap::new();
     for c in polymer {
-        match freq.get_mut(c) {
-            None => {
-                freq.insert(*c, 0);
-            }
-            Some(x) => *x += 1,
-        }
+        *freq.entry(*c).or_insert(0) += 1;
     }
     freq
 }
@@ -128,14 +124,7 @@ fn statistical_solve(
 }
 
 fn add_to_map<T: Hash + Eq>(map: &mut HashMap<T, usize>, index: T, val: usize) {
-    match map.get_mut(&index) {
-        None => {
-            map.insert(index, val);
-        }
-        Some(x) => {
-            *x += val;
-        }
-    }
+    *map.entry(index).or_insert(0) += val;
 }
 
 pub fn part2(input: &str) -> String {

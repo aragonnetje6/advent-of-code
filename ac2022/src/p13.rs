@@ -42,10 +42,10 @@ impl PartialOrd<Self> for Packet {
 impl Ord for Packet {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Packet::List(left), Packet::List(right)) => left.cmp(right),
-            (Packet::List(left), Packet::Number(_)) => left.cmp(&vec![other.clone()]),
-            (Packet::Number(_), Packet::List(right)) => vec![self.clone()].cmp(right),
-            (Packet::Number(left), Packet::Number(right)) => left.cmp(right),
+            (Self::List(left), Self::List(right)) => left.cmp(right),
+            (Self::List(left), Self::Number(_)) => left.cmp(&vec![other.clone()]),
+            (Self::Number(_), Self::List(right)) => vec![self.clone()].cmp(right),
+            (Self::Number(left), Self::Number(right)) => left.cmp(right),
         }
     }
 }
@@ -53,12 +53,12 @@ impl Ord for Packet {
 impl Display for Packet {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Packet::Number(x) => write!(f, "{x}"),
-            Packet::List(arr) => write!(
+            Self::Number(x) => write!(f, "{x}"),
+            Self::List(arr) => write!(
                 f,
                 "[{}]",
                 arr.iter()
-                    .map(Packet::to_string)
+                    .map(Self::to_string)
                     .reduce(|acc, elem| format!("{acc},{elem}"))
                     .unwrap_or_default()
             ),
@@ -77,8 +77,8 @@ pub fn part1(input: &str) -> String {
         .to_string()
 }
 
-fn transform_data(mut data: Vec<PacketPair>) -> Vec<Packet> {
-    data.drain(..).flat_map(|(p1, p2)| [p1, p2]).collect()
+fn transform_data(data: Vec<PacketPair>) -> Vec<Packet> {
+    data.into_iter().flat_map(|(p1, p2)| [p1, p2]).collect()
 }
 
 pub fn part2(input: &str) -> String {

@@ -29,7 +29,7 @@ fn min_alignment_cost<F: Fn(u32, u32) -> u32>(positions: &[u32], cost_function: 
         .unwrap()
 }
 
-fn linear_cost(current: u32, target: u32) -> u32 {
+const fn linear_cost(current: u32, target: u32) -> u32 {
     current.abs_diff(target)
 }
 
@@ -38,7 +38,7 @@ pub fn part1(input: &str) -> String {
     min_alignment_cost(&data, &linear_cost).to_string()
 }
 
-fn incrementing_cost(current: u32, target: u32) -> u32 {
+const fn incrementing_cost(current: u32, target: u32) -> u32 {
     let dist = current.abs_diff(target);
     dist * (dist + 1) / 2
 }

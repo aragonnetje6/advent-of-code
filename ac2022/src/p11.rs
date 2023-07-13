@@ -188,7 +188,7 @@ impl SmartMonkey {
                      if_true,
                      if_false,
                      inspections,
-                 }| SmartMonkey {
+                 }| Self {
                     operation,
                     test,
                     if_true,

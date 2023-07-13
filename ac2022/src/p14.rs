@@ -18,14 +18,14 @@ struct Point {
 }
 
 impl Point {
-    pub fn new(x: usize, y: usize) -> Self {
+    pub const fn new(x: usize, y: usize) -> Self {
         Self { x, y }
     }
 }
 
 impl From<(usize, usize)> for Point {
     fn from(value: (usize, usize)) -> Self {
-        Point::new(value.0, value.1)
+        Self::new(value.0, value.1)
     }
 }
 
@@ -129,8 +129,9 @@ impl IndexMut<(usize, usize)> for CaveWall {
     }
 }
 
-impl From<&[Vec<Point>]> for CaveWall {
-    fn from(formation: &[Vec<Point>]) -> Self {
+impl TryFrom<&[Vec<Point>]> for CaveWall {
+    type Error = String;
+    fn try_from(formation: &[Vec<Point>]) -> Result<Self, Self::Error> {
         let x_min = 0;
         let y_min = 0;
         let x_max = 1000;
@@ -139,7 +140,7 @@ impl From<&[Vec<Point>]> for CaveWall {
             .flatten()
             .map(|Point { y, .. }| y)
             .max()
-            .unwrap()
+            .ok_or_else(|| "invalid".to_string())?
             + 1;
         let grid = vec![vec![Tile::Air; x_max - x_min + 1]; y_max - y_min + 1];
         let mut result = Self {
@@ -153,7 +154,7 @@ impl From<&[Vec<Point>]> for CaveWall {
         for path in formation {
             result.add_path(path);
         }
-        result
+        Ok(result)
     }
 }
 
@@ -194,14 +195,14 @@ impl Display for Tile {
 
 pub fn part1(input: &str) -> String {
     let (_, data) = formation(input).unwrap();
-    let mut wall = CaveWall::from(&*data);
+    let mut wall = CaveWall::try_from(&*data).unwrap();
     while wall.drop_sand(500, 0) {}
     wall.count(Tile::Sand).to_string()
 }
 
 pub fn part2(input: &str) -> String {
     let (_, data) = formation(input).unwrap();
-    let mut wall = CaveWall::from(&*data);
+    let mut wall = CaveWall::try_from(&*data).unwrap();
     wall.has_floor = true;
     while wall.drop_sand(500, 0) {}
     wall.count(Tile::Sand).to_string()
