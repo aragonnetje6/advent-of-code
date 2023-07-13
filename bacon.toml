@@ -15,11 +15,11 @@ need_stdout = false
 watch = ["tests", "benches", "examples"]
 
 [jobs.clippy]
-command = ["cargo", "mommy", "clippy", "--color", "always", "--", "-W", "clippy::pedantic"]
+command = ["cargo", "mommy", "clippy", "--color", "always", "--", "-W", "clippy::pedantic", "-W", "clippy::nursery"]
 need_stdout = false
 
 [jobs.clippy-all]
-command = ["cargo", "mommy", "clippy", "--all-targets", "--color", "always", "--", "-W", "clippy::pedantic"]
+command = ["cargo", "mommy", "clippy", "--all-targets", "--color", "always", "--", "-W", "clippy::pedantic", "-W", "clippy::nursery"]
 need_stdout = false
 watch = ["tests", "benches", "examples"]
 
