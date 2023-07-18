@@ -55,4 +55,5 @@ fn main() {
     solution!(16, 1);
     solution!(16, 2);
     solution!(17, 1);
+    solution!(17, 2);
 }
