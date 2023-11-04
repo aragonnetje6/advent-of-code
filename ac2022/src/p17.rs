@@ -1,4 +1,3 @@
-use indicatif::ProgressIterator;
 use itertools::Itertools;
 use std::{fmt::Display, ops::Range};
 
@@ -168,13 +167,36 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
 ];
 
 #[derive(Debug, Clone)]
-struct Board {
+struct SaveState {
+    board: Vec<[Rock; 7]>,
+    move_index: usize,
+    block_index: usize,
+    total_blocks: usize,
+    height: usize,
+}
+
+impl PartialEq for SaveState {
+    fn eq(&self, other: &Self) -> bool {
+        self.board == other.board
+            && self.move_index == other.move_index
+            && self.block_index == other.block_index
+    }
+}
+
+type EnumeratedEndless<'a, T> =
+    std::iter::Flatten<std::iter::Repeat<std::iter::Enumerate<std::slice::Iter<'a, T>>>>;
+
+#[derive(Debug, Clone)]
+struct Board<'a> {
     board: Vec<[Rock; 7]>,
     truncated_height: usize,
     block_range: Range<usize>,
+    savestates: Vec<SaveState>,
+    moves_loop: EnumeratedEndless<'a, Move>,
+    blocks_loop: EnumeratedEndless<'static, [[Rock; 7]; 7]>,
 }
 
-impl Display for Board {
+impl<'a> Display for Board<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
@@ -198,12 +220,15 @@ impl Display for Board {
     }
 }
 
-impl Board {
-    const fn new() -> Self {
+impl<'a> Board<'a> {
+    fn new(moves: &'a [Move]) -> Self {
         Self {
             board: vec![],
             truncated_height: 0,
             block_range: 0..0,
+            savestates: vec![],
+            moves_loop: std::iter::repeat(moves.iter().enumerate()).flatten(),
+            blocks_loop: std::iter::repeat(BLOCKS.iter().enumerate()).flatten(),
         }
     }
 
@@ -281,10 +306,9 @@ impl Board {
         }
     }
 
-    fn simulate(&mut self, moves: &[Move], count: usize) {
-        let mut moves_loop = std::iter::repeat(moves.iter()).flatten();
-        let blocks_loop = std::iter::repeat(BLOCKS.iter()).flatten();
-        for block in blocks_loop.take(count).progress_count(count as u64) {
+    fn simulate(&mut self, count: usize) {
+        for _ in 0..count {
+            let (_, block) = self.blocks_loop.next().expect("infinite iterator");
             self.board.extend(block);
             self.block_range = self.board.len() - 4
                 ..self.board.len()
@@ -293,19 +317,47 @@ impl Board {
                         .filter(|x| x.contains(&Rock::MovingRock))
                         .count());
             loop {
-                let next_move = moves_loop.next().expect("infinite iterator");
-                // println!("{self}");
+                let next_move = self.moves_loop.next().expect("infinite iterator").1;
                 match next_move {
                     Move::Left => self.move_left(),
                     Move::Right => self.move_right(),
                 }
-                // println!("{self}");
                 if !self.fall() {
                     break;
                 }
             }
             self.solidify();
             self.trim();
+        }
+    }
+
+    fn simulate_until_cycle(&mut self, count: usize) {
+        for i in 1..=count {
+            let (block_index, block) = self.blocks_loop.next().expect("infinite iterator");
+            self.board.extend(block);
+            self.block_range = self.board.len() - 4
+                ..self.board.len()
+                    - (4 - block
+                        .iter()
+                        .filter(|x| x.contains(&Rock::MovingRock))
+                        .count());
+            let move_index = loop {
+                let (move_i, next_move) = self.moves_loop.next().expect("infinite iterator");
+                match next_move {
+                    Move::Left => self.move_left(),
+                    Move::Right => self.move_right(),
+                }
+                if !self.fall() {
+                    break move_i;
+                }
+            };
+            self.solidify();
+            if let Some((height_diff, block_diff)) = self.trim_and_save(move_index, block_index, i)
+            {
+                self.truncated_height += (count - i) / block_diff * height_diff;
+                self.simulate((count - i) % block_diff);
+                break;
+            }
         }
     }
 
@@ -319,8 +371,45 @@ impl Board {
         self.board.truncate(self.board.len() - count);
     }
 
-    fn height(&mut self) -> usize {
+    fn trim_and_save(
+        &mut self,
+        move_index: usize,
+        block_index: usize,
+        total_blocks: usize,
+    ) -> Option<(usize, usize)> {
         self.trim();
+        if let Some(i) = self
+            .block_range
+            .clone()
+            .find(|ri| !self.board[*ri].contains(&Rock::Air))
+        {
+            self.truncated_height += i + 1;
+            self.board = self.board[i + 1..].to_vec();
+            let savestate = SaveState {
+                board: self.board.clone(),
+                move_index,
+                block_index,
+                total_blocks,
+                height: self.height(),
+            };
+            if let Some(other) = self.savestates.iter().rev().find(|x| x == &&savestate) {
+                println!(
+                    "Cycle found, current height: {}, cycle height: {}, cycle blocks: {}",
+                    savestate.height,
+                    savestate.height - other.height,
+                    savestate.total_blocks - other.total_blocks
+                );
+                return Some((
+                    savestate.height - other.height,
+                    savestate.total_blocks - other.total_blocks,
+                ));
+            }
+            self.savestates.push(savestate);
+        }
+        None
+    }
+
+    fn height(&mut self) -> usize {
         self.board.len() + self.truncated_height
     }
 
@@ -354,9 +443,8 @@ pub fn part1(input: &str) -> String {
             _ => panic!("wrong input"),
         })
         .collect();
-    let mut board = Board::new();
-    board.simulate(&data, 2022);
-    board.trim();
+    let mut board = Board::new(&data);
+    board.simulate_until_cycle(2022);
     board.height().to_string()
 }
 
@@ -370,9 +458,8 @@ pub fn part2(input: &str) -> String {
             _ => panic!("wrong input"),
         })
         .collect();
-    let mut board = Board::new();
-    board.simulate(&data, 1_000_000_000_000);
-    board.trim();
+    let mut board = Board::new(&data);
+    board.simulate_until_cycle(1_000_000_000_000);
     board.height().to_string()
 }
 
@@ -388,7 +475,6 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
         assert_eq!(part2(DATA1), "1_514_285_714_288");
     }
