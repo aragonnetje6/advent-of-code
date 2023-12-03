@@ -20,7 +20,7 @@ pub fn part1(input: &str) -> String {
             .join(""),
         2,
     )
-    .unwrap();
+    .expect("Invalid digit");
     let gamma = u32::from_str_radix(
         &occurences
             .iter()

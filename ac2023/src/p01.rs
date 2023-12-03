@@ -60,7 +60,7 @@ pub fn part2(input: &str) -> String {
                 })
                 .collect::<Vec<u32>>()
         })
-        .map(|x| x.first().unwrap() * 10 + x.last().unwrap())
+        .map(|x| x.first().expect("no digit on line") * 10 + x.last().expect("no digit on line"))
         .sum::<u32>()
         .to_string()
 }
