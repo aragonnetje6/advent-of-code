@@ -24,7 +24,8 @@ mod p02;
 fn main() {
     solution!(01, 1);
     solution!(01, 2);
-    // solution!(02, 2);
+    solution!(02, 1);
+    solution!(02, 2);
     // solution!(03, 1);
     // solution!(03, 2);
     // solution!(04, 1);
