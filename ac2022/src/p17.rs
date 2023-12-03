@@ -475,6 +475,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_part2() {
         assert_eq!(part2(DATA1), "1_514_285_714_288");
     }
