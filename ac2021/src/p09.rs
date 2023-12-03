@@ -11,7 +11,7 @@ fn parse_heightmap(input: &str) -> Vec<Vec<u32>> {
         .collect()
 }
 
-fn list_valid_neighbours<T>(map: &Vec<Vec<T>>, x: usize, y: usize) -> Vec<(usize, usize)> {
+fn list_valid_neighbours<T>(map: &[Vec<T>], x: usize, y: usize) -> Vec<(usize, usize)> {
     let mut out = vec![];
     if x > 0 {
         out.push((x - 1, y));
@@ -28,7 +28,7 @@ fn list_valid_neighbours<T>(map: &Vec<Vec<T>>, x: usize, y: usize) -> Vec<(usize
     out
 }
 
-fn list_low_points(map: &Vec<Vec<u32>>) -> Vec<(usize, usize)> {
+fn list_low_points(map: &[Vec<u32>]) -> Vec<(usize, usize)> {
     map.iter()
         .enumerate()
         .flat_map(|(x, line)| {
@@ -54,7 +54,7 @@ pub fn part1(input: &str) -> String {
         .to_string()
 }
 
-fn get_basin_size(low_point: &(usize, usize), map: &Vec<Vec<u32>>) -> usize {
+fn get_basin_size(low_point: &(usize, usize), map: &[Vec<u32>]) -> usize {
     let mut checked = HashSet::new();
     let mut tbd = VecDeque::from(vec![*low_point]);
     while !tbd.is_empty() {

@@ -71,7 +71,7 @@ pub fn part1(input: &str) -> String {
         .to_string()
 }
 
-fn get_view_from(trees: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
+fn get_view_from(trees: &[Vec<u8>], x: usize, y: usize) -> usize {
     let mut result = 1;
     let height = trees[x][y];
     for new_x in x + 1..trees.len() {

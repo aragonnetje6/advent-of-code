@@ -69,7 +69,7 @@ fn index_row(input: &str) -> IResult<&str, Vec<u8>> {
     separated_list1(tag(" "), stack_index)(input)
 }
 
-fn transpose<T: Copy>(original: &Vec<Vec<T>>) -> Vec<Vec<T>> {
+fn transpose<T: Copy>(original: &[Vec<T>]) -> Vec<Vec<T>> {
     (0..original[0].len())
         .map(|index2| {
             (0..original.len())

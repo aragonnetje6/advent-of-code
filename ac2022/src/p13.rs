@@ -78,7 +78,7 @@ pub fn part1(input: &str) -> String {
 }
 
 fn transform_data(data: Vec<PacketPair>) -> Vec<Packet> {
-    data.into_iter().flat_map(|(p1, p2)| [p1, p2]).collect()
+    data.into_iter().flat_map(<[Packet; 2]>::from).collect()
 }
 
 pub fn part2(input: &str) -> String {

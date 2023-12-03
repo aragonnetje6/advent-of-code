@@ -10,8 +10,8 @@ enum Move {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Rock {
     Air,
-    SettledRock,
-    MovingRock,
+    Settled,
+    Moving,
 }
 
 const BLOCKS: [[[Rock; 7]; 7]; 5] = [
@@ -22,10 +22,10 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
-            Rock::MovingRock,
-            Rock::MovingRock,
-            Rock::MovingRock,
+            Rock::Moving,
+            Rock::Moving,
+            Rock::Moving,
+            Rock::Moving,
             Rock::Air,
         ],
         [Rock::Air; 7],
@@ -40,7 +40,7 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
             Rock::Air,
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -48,9 +48,9 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
-            Rock::MovingRock,
-            Rock::MovingRock,
+            Rock::Moving,
+            Rock::Moving,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
         ],
@@ -58,41 +58,8 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
             Rock::Air,
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
+            Rock::Moving,
             Rock::Air,
-            Rock::Air,
-            Rock::Air,
-        ],
-        [Rock::Air; 7],
-    ],
-    [
-        [Rock::Air; 7],
-        [Rock::Air; 7],
-        [Rock::Air; 7],
-        [
-            Rock::Air,
-            Rock::Air,
-            Rock::MovingRock,
-            Rock::MovingRock,
-            Rock::MovingRock,
-            Rock::Air,
-            Rock::Air,
-        ],
-        [
-            Rock::Air,
-            Rock::Air,
-            Rock::Air,
-            Rock::Air,
-            Rock::MovingRock,
-            Rock::Air,
-            Rock::Air,
-        ],
-        [
-            Rock::Air,
-            Rock::Air,
-            Rock::Air,
-            Rock::Air,
-            Rock::MovingRock,
             Rock::Air,
             Rock::Air,
         ],
@@ -105,7 +72,40 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
+            Rock::Moving,
+            Rock::Moving,
+            Rock::Moving,
+            Rock::Air,
+            Rock::Air,
+        ],
+        [
+            Rock::Air,
+            Rock::Air,
+            Rock::Air,
+            Rock::Air,
+            Rock::Moving,
+            Rock::Air,
+            Rock::Air,
+        ],
+        [
+            Rock::Air,
+            Rock::Air,
+            Rock::Air,
+            Rock::Air,
+            Rock::Moving,
+            Rock::Air,
+            Rock::Air,
+        ],
+        [Rock::Air; 7],
+    ],
+    [
+        [Rock::Air; 7],
+        [Rock::Air; 7],
+        [Rock::Air; 7],
+        [
+            Rock::Air,
+            Rock::Air,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -114,7 +114,7 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -123,7 +123,7 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -132,7 +132,7 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -146,8 +146,8 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
-            Rock::MovingRock,
+            Rock::Moving,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -155,8 +155,8 @@ const BLOCKS: [[[Rock; 7]; 7]; 5] = [
         [
             Rock::Air,
             Rock::Air,
-            Rock::MovingRock,
-            Rock::MovingRock,
+            Rock::Moving,
+            Rock::Moving,
             Rock::Air,
             Rock::Air,
             Rock::Air,
@@ -188,7 +188,7 @@ type EnumeratedEndless<'a, T> =
 
 #[derive(Debug, Clone)]
 struct Board<'a> {
-    board: Vec<[Rock; 7]>,
+    grid: Vec<[Rock; 7]>,
     truncated_height: usize,
     block_range: Range<usize>,
     savestates: Vec<SaveState>,
@@ -201,7 +201,7 @@ impl<'a> Display for Board<'a> {
         write!(
             f,
             "{}",
-            self.board
+            self.grid
                 .iter()
                 .rev()
                 .map(|arr| format!(
@@ -209,8 +209,8 @@ impl<'a> Display for Board<'a> {
                     arr.iter()
                         .map(|r| match r {
                             Rock::Air => '.',
-                            Rock::SettledRock => '#',
-                            Rock::MovingRock => '@',
+                            Rock::Settled => '#',
+                            Rock::Moving => '@',
                         })
                         .collect::<String>()
                 ))
@@ -223,7 +223,7 @@ impl<'a> Display for Board<'a> {
 impl<'a> Board<'a> {
     fn new(moves: &'a [Move]) -> Self {
         Self {
-            board: vec![],
+            grid: vec![],
             truncated_height: 0,
             block_range: 0..0,
             savestates: vec![],
@@ -239,16 +239,16 @@ impl<'a> Board<'a> {
         if !self
             .block_range
             .clone()
-            .all(|i| (0..7).all(|j| check_move(self.board[i][j], self.board[i - 1][j]).is_some()))
+            .all(|i| (0..7).all(|j| check_move(self.grid[i][j], self.grid[i - 1][j]).is_some()))
         {
             return false;
         }
         for i in self.block_range.clone() {
             for j in 0..7 {
                 let (new_upper, new_lower) =
-                    check_move(self.board[i][j], self.board[i - 1][j]).expect("just checked");
-                self.board[i][j] = new_upper;
-                self.board[i - 1][j] = new_lower;
+                    check_move(self.grid[i][j], self.grid[i - 1][j]).expect("just checked");
+                self.grid[i][j] = new_upper;
+                self.grid[i - 1][j] = new_lower;
             }
         }
         self.block_range = self.block_range.start - 1..self.block_range.end - 1;
@@ -259,24 +259,24 @@ impl<'a> Board<'a> {
         if self
             .block_range
             .clone()
-            .any(|i| self.board[i][0] == Rock::MovingRock)
+            .any(|i| self.grid[i][0] == Rock::Moving)
         {
             return;
         }
         if !self
             .block_range
             .clone()
-            .all(|i| (0..6).all(|j| check_move(self.board[i][j + 1], self.board[i][j]).is_some()))
+            .all(|i| (0..6).all(|j| check_move(self.grid[i][j + 1], self.grid[i][j]).is_some()))
         {
             return;
         }
         for i in self.block_range.clone() {
             for j in 0..6 {
                 let (new_src, new_dest) =
-                    check_move(self.board[i][j + 1], self.board[i][j]).expect("just checked");
+                    check_move(self.grid[i][j + 1], self.grid[i][j]).expect("just checked");
 
-                self.board[i][j + 1] = new_src;
-                self.board[i][j] = new_dest;
+                self.grid[i][j + 1] = new_src;
+                self.grid[i][j] = new_dest;
             }
         }
     }
@@ -285,23 +285,23 @@ impl<'a> Board<'a> {
         if self
             .block_range
             .clone()
-            .any(|i| self.board[i][6] == Rock::MovingRock)
+            .any(|i| self.grid[i][6] == Rock::Moving)
         {
             return;
         }
         if !self
             .block_range
             .clone()
-            .all(|i| (0..6).all(|j| check_move(self.board[i][j], self.board[i][j + 1]).is_some()))
+            .all(|i| (0..6).all(|j| check_move(self.grid[i][j], self.grid[i][j + 1]).is_some()))
         {
             return;
         }
         for i in self.block_range.clone() {
             for j in (0..6).rev() {
                 let (new_src, new_dest) =
-                    check_move(self.board[i][j], self.board[i][j + 1]).expect("just checked");
-                self.board[i][j] = new_src;
-                self.board[i][j + 1] = new_dest;
+                    check_move(self.grid[i][j], self.grid[i][j + 1]).expect("just checked");
+                self.grid[i][j] = new_src;
+                self.grid[i][j + 1] = new_dest;
             }
         }
     }
@@ -309,13 +309,10 @@ impl<'a> Board<'a> {
     fn simulate(&mut self, count: usize) {
         for _ in 0..count {
             let (_, block) = self.blocks_loop.next().expect("infinite iterator");
-            self.board.extend(block);
-            self.block_range = self.board.len() - 4
-                ..self.board.len()
-                    - (4 - block
-                        .iter()
-                        .filter(|x| x.contains(&Rock::MovingRock))
-                        .count());
+            self.grid.extend(block);
+            self.block_range = self.grid.len() - 4
+                ..self.grid.len()
+                    - (4 - block.iter().filter(|x| x.contains(&Rock::Moving)).count());
             loop {
                 let next_move = self.moves_loop.next().expect("infinite iterator").1;
                 match next_move {
@@ -334,13 +331,10 @@ impl<'a> Board<'a> {
     fn simulate_until_cycle(&mut self, count: usize) {
         for i in 1..=count {
             let (block_index, block) = self.blocks_loop.next().expect("infinite iterator");
-            self.board.extend(block);
-            self.block_range = self.board.len() - 4
-                ..self.board.len()
-                    - (4 - block
-                        .iter()
-                        .filter(|x| x.contains(&Rock::MovingRock))
-                        .count());
+            self.grid.extend(block);
+            self.block_range = self.grid.len() - 4
+                ..self.grid.len()
+                    - (4 - block.iter().filter(|x| x.contains(&Rock::Moving)).count());
             let move_index = loop {
                 let (move_i, next_move) = self.moves_loop.next().expect("infinite iterator");
                 match next_move {
@@ -363,12 +357,12 @@ impl<'a> Board<'a> {
 
     fn trim(&mut self) {
         let count = self
-            .board
+            .grid
             .iter()
             .rev()
-            .take_while(|x| !x.contains(&Rock::SettledRock) && !x.contains(&Rock::MovingRock))
+            .take_while(|x| !x.contains(&Rock::Settled) && !x.contains(&Rock::Moving))
             .count();
-        self.board.truncate(self.board.len() - count);
+        self.grid.truncate(self.grid.len() - count);
     }
 
     fn trim_and_save(
@@ -381,12 +375,12 @@ impl<'a> Board<'a> {
         if let Some(i) = self
             .block_range
             .clone()
-            .find(|ri| !self.board[*ri].contains(&Rock::Air))
+            .find(|ri| !self.grid[*ri].contains(&Rock::Air))
         {
             self.truncated_height += i + 1;
-            self.board = self.board[i + 1..].to_vec();
+            self.grid = self.grid[i + 1..].to_vec();
             let savestate = SaveState {
-                board: self.board.clone(),
+                board: self.grid.clone(),
                 move_index,
                 block_index,
                 total_blocks,
@@ -410,15 +404,15 @@ impl<'a> Board<'a> {
     }
 
     fn height(&mut self) -> usize {
-        self.board.len() + self.truncated_height
+        self.grid.len() + self.truncated_height
     }
 
     fn solidify(&mut self) {
         for i in self.block_range.clone() {
             for j in 0..7 {
-                let x = &mut self.board[i][j];
-                if matches!(x, Rock::MovingRock) {
-                    *x = Rock::SettledRock;
+                let x = &mut self.grid[i][j];
+                if matches!(x, Rock::Moving) {
+                    *x = Rock::Settled;
                 }
             }
         }
@@ -427,9 +421,9 @@ impl<'a> Board<'a> {
 
 const fn check_move(src: Rock, dest: Rock) -> Option<(Rock, Rock)> {
     match (src, dest) {
-        (Rock::MovingRock, Rock::Air | Rock::MovingRock) => Some((Rock::Air, Rock::MovingRock)),
-        (Rock::MovingRock, Rock::SettledRock) => None,
-        (Rock::Air | Rock::SettledRock, _) => Some((src, dest)),
+        (Rock::Moving, Rock::Air | Rock::Moving) => Some((Rock::Air, Rock::Moving)),
+        (Rock::Moving, Rock::Settled) => None,
+        (Rock::Air | Rock::Settled, _) => Some((src, dest)),
     }
 }
 

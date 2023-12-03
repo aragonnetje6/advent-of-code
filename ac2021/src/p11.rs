@@ -9,7 +9,7 @@ fn parse(input: &str) -> Vec<Vec<u8>> {
         .collect()
 }
 
-fn step(octopuses: &mut Vec<Vec<u8>>) -> usize {
+fn step(octopuses: &mut [Vec<u8>]) -> usize {
     octopuses
         .iter_mut()
         .for_each(|row| row.iter_mut().for_each(|x| *x += 1));

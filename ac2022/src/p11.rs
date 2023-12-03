@@ -102,7 +102,7 @@ struct Monkey {
     inspections: u128,
 }
 
-fn run_monkeys(monkeys: &mut Vec<Monkey>) {
+fn run_monkeys(monkeys: &mut [Monkey]) {
     for i in 0..monkeys.len() {
         while !monkeys[i].items.is_empty() {
             monkeys[i].inspections += 1;
@@ -201,7 +201,7 @@ impl SmartMonkey {
     }
 }
 
-fn run_monkeys2(monkeys: &mut Vec<SmartMonkey>) {
+fn run_monkeys2(monkeys: &mut [SmartMonkey]) {
     for i in 0..monkeys.len() {
         while !monkeys[i].items.is_empty() {
             monkeys[i].inspections += 1;
