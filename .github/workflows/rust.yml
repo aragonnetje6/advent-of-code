@@ -25,3 +25,5 @@ jobs:
         run: cargo run --bin ac2021 --release
       - name: Run 2022
         run: cargo run --bin ac2022 --release
+      - name: Run 2023
+        run: cargo run --bin ac2023 --release
