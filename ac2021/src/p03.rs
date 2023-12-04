@@ -29,14 +29,14 @@ pub fn part1(input: &str) -> String {
             .join(""),
         2,
     )
-    .unwrap();
+    .expect("invalid digit");
     (epsilon * gamma).to_string()
 }
 
 fn get_digit(input: &[&str], index: usize) -> Vec<char> {
     input
         .iter()
-        .map(|item| item.chars().nth(index).unwrap())
+        .map(|item| item.chars().nth(index).expect("no digit"))
         .collect()
 }
 
@@ -51,18 +51,18 @@ fn get_most_common(input: &[char]) -> char {
 pub fn part2(input: &str) -> String {
     let mut ogr_data: Vec<&str> = input.lines().collect();
     let mut co2_data: Vec<&str> = input.lines().collect();
-    for i in 0..input.lines().next().unwrap().len() {
+    for i in 0..input.lines().next().expect("empty input").len() {
         let most_common_ogr = get_most_common(&get_digit(&ogr_data, i));
         if ogr_data.len() > 1 {
-            ogr_data.retain(|x| x.chars().nth(i).unwrap() == most_common_ogr);
+            ogr_data.retain(|x| x.chars().nth(i).expect("empty line") == most_common_ogr);
         }
         let most_common_co2 = get_most_common(&get_digit(&co2_data, i));
         if co2_data.len() > 1 {
-            co2_data.retain(|x| x.chars().nth(i).unwrap() != most_common_co2);
+            co2_data.retain(|x| x.chars().nth(i).expect("empty line") != most_common_co2);
         }
     }
-    let ogr = u32::from_str_radix(ogr_data.first().unwrap(), 2).unwrap();
-    let co2 = u32::from_str_radix(co2_data.first().unwrap(), 2).unwrap();
+    let ogr = u32::from_str_radix(ogr_data.first().expect("invalid ogr"), 2).expect("invalid ogr");
+    let co2 = u32::from_str_radix(co2_data.first().expect("invalid co2"), 2).expect("invalid co2");
     (ogr * co2).to_string()
 }
 

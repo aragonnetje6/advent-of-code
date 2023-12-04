@@ -18,7 +18,7 @@ impl FromStr for Bingo {
         let mut board: [[u8; 5]; 5] = [[0; 5]; 5];
         for i in 0..board.len() {
             for j in 0..board[0].len() {
-                board[i][j] = data.next().unwrap();
+                board[i][j] = data.next().expect("eof");
             }
         }
         Ok(Self {
@@ -64,20 +64,24 @@ impl Bingo {
     }
 }
 
-fn parse_input(input: &str) -> (Vec<u8>, Vec<Bingo>) {
+fn parse_input(input: &str) -> Result<(Vec<u8>, Vec<Bingo>), String> {
     let mut blocks = input.split("\n\n");
     let nums: Vec<u8> = blocks
         .next()
-        .unwrap()
+        .ok_or_else(|| "No block".to_string())?
         .split(',')
-        .map(|x| x.parse::<u8>().unwrap())
-        .collect();
-    let bingos: Vec<Bingo> = blocks.map(|block| block.parse().unwrap()).collect();
-    (nums, bingos)
+        .map(str::parse::<u8>)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())?;
+    let bingos: Vec<Bingo> = blocks
+        .map(str::parse)
+        .collect::<Result<Vec<Bingo>, &str>>()
+        .map_err(|e| e.to_string())?;
+    Ok((nums, bingos))
 }
 
 pub fn part1(input: &str) -> String {
-    let (nums, mut bingos) = parse_input(input);
+    let (nums, mut bingos) = parse_input(input).expect("parsing failed");
     for num in nums {
         bingos.iter_mut().for_each(|bingo| bingo.check(num));
         if let Some(winner) = bingos.iter().find(|x| x.has_won()) {
@@ -88,7 +92,7 @@ pub fn part1(input: &str) -> String {
 }
 
 pub fn part2(input: &str) -> String {
-    let (nums, mut bingos) = parse_input(input);
+    let (nums, mut bingos) = parse_input(input).expect("parsing failed");
     let mut nums_iter = nums.iter();
     while bingos.iter().filter(|x| !x.has_won()).count() > 1 {
         let num = *nums_iter.next().unwrap();

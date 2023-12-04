@@ -59,7 +59,7 @@ fn cube(input: &str) -> IResult<&str, (Colour, u32)> {
 }
 
 pub fn part1(input: &str) -> String {
-    let (_, result) = parse(input).unwrap();
+    let (_, result) = parse(input).expect("parsing failed");
     result
         .iter()
         .enumerate()
@@ -76,7 +76,7 @@ pub fn part1(input: &str) -> String {
 }
 
 pub fn part2(input: &str) -> String {
-    let (_, result) = parse(input).unwrap();
+    let (_, result) = parse(input).expect("parsing failed");
     result
         .iter()
         .map(|game| {

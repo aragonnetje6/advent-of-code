@@ -1,5 +1,9 @@
 pub fn part1(input: &str) -> String {
-    process_input(input).iter().max().unwrap().to_string()
+    process_input(input)
+        .iter()
+        .max()
+        .expect("empty input")
+        .to_string()
 }
 
 fn process_input(input: &str) -> Vec<u32> {

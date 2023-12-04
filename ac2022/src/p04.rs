@@ -6,11 +6,18 @@ pub fn part1(input: &str) -> String {
             let mut line_iter = line.split(',').map(|elf| {
                 let mut iter = elf.split('-');
                 (
-                    iter.next().unwrap().parse::<u32>().unwrap(),
-                    iter.next().unwrap().parse::<u32>().unwrap(),
+                    iter.next()
+                        .and_then(|x| x.parse::<u32>().ok())
+                        .expect("parsing failure"),
+                    iter.next()
+                        .and_then(|x| x.parse::<u32>().ok())
+                        .expect("parsing failure"),
                 )
             });
-            (line_iter.next().unwrap(), line_iter.next().unwrap())
+            (
+                line_iter.next().expect("parsing failure"),
+                line_iter.next().expect("parsing failure"),
+            )
         })
         .filter(|((elf1_low, elf1_high), (elf2_low, elf2_high))| {
             (elf1_low <= elf2_low && elf1_high >= elf2_high)
@@ -28,11 +35,18 @@ pub fn part2(input: &str) -> String {
             let mut line_iter = line.split(',').map(|elf| {
                 let mut iter = elf.split('-');
                 (
-                    iter.next().unwrap().parse::<u32>().unwrap(),
-                    iter.next().unwrap().parse::<u32>().unwrap(),
+                    iter.next()
+                        .and_then(|x| x.parse::<u32>().ok())
+                        .expect("parsing failure"),
+                    iter.next()
+                        .and_then(|x| x.parse::<u32>().ok())
+                        .expect("parsing failure"),
                 )
             });
-            (line_iter.next().unwrap(), line_iter.next().unwrap())
+            (
+                line_iter.next().expect("parsing failure"),
+                line_iter.next().expect("parsing failure"),
+            )
         })
         .filter(|((elf1_low, elf1_high), (elf2_low, elf2_high))| {
             (elf1_low <= elf2_low && elf1_high >= elf2_high)
