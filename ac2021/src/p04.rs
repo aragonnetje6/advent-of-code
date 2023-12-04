@@ -76,7 +76,7 @@ fn parse_input(input: &str) -> Result<(Vec<u8>, Vec<Bingo>), String> {
     let bingos: Vec<Bingo> = blocks
         .map(str::parse)
         .collect::<Result<Vec<Bingo>, &str>>()
-        .map_err(|e| e.to_string())?;
+        .map_err(str::to_string)?;
     Ok((nums, bingos))
 }
 
