@@ -1,3 +1,8 @@
 [workspace]
 members = ["ac2021", "ac2022", "ac2023", "lib"]
 resolver = "2"
+
+[workspace.dependencies]
+nom = "7.1.3"
+indicatif = "0.17.7"
+itertools = "0.12.0"
