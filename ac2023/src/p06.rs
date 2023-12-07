@@ -63,11 +63,14 @@ fn parse2(input: &str) -> IResult<&str, (u64, u64)> {
 
 pub fn part2(input: &str) -> String {
     let (_, (time, distance)) = parse2(input).expect("parsing failed");
-    (1..time)
-        .map(|v| v * (time - v))
-        .filter(|d| d > &distance)
+    ((time / 2..time)
+        .take_while(|v| v * (time - v) > distance)
         .count()
-        .to_string()
+        + (0..time / 2)
+            .rev()
+            .take_while(|v| v * (time - v) > distance)
+            .count())
+    .to_string()
 }
 
 #[cfg(test)]
