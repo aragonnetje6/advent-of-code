@@ -26,6 +26,7 @@ dependencies = [
 name = "ac2023"
 version = "0.1.0"
 dependencies = [
+ "itertools",
  "lib",
  "nom",
 ]
