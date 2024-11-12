@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 lib = { path = "./../lib" }
 nom = { workspace = true }
-itertools ={ workspace = true }
+itertools = { workspace = true }
+nom_locate = "4.2.0"
