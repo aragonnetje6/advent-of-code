@@ -137,7 +137,7 @@ fn lcm(mut input: Vec<usize>) -> usize {
             break;
         }
     }
-    return factors.iter().product();
+    factors.iter().product()
 }
 
 pub fn part2(input: &str) -> String {
