@@ -9,4 +9,5 @@ edition = "2021"
 lib = { path = "./../lib" }
 nom = { workspace = true }
 itertools = { workspace = true }
+indicatif = { workspace = true }
 nom_locate = "4.2.0"
