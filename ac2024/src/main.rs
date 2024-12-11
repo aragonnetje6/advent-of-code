@@ -4,6 +4,7 @@ use lib::solution;
 
 mod p01;
 mod p02;
+mod p03;
 
 #[allow(clippy::zero_prefixed_literal)]
 fn main() {
@@ -11,4 +12,6 @@ fn main() {
     solution!(01, 2);
     solution!(02, 1);
     solution!(02, 2);
+    solution!(03, 1);
+    solution!(03, 2);
 }
