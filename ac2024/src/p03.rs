@@ -42,7 +42,7 @@ fn parse(input: &str) -> IResult<&str, Vec<Operation>> {
             map(op_dont, Some),
             value(None, take(1usize)),
         ))),
-        |x| x.into_iter().filter_map(|x| x).collect(),
+        |x| x.into_iter().flatten().collect(),
     )(input)
 }
 
@@ -51,8 +51,7 @@ pub fn part1(input: &str) -> String {
     ops.into_iter()
         .filter_map(|operation| match operation {
             Operation::Mul(x, y) => Some(x * y),
-            Operation::Do => None,
-            Operation::Dont => None,
+            Operation::Do | Operation::Dont => None,
         })
         .sum::<u64>()
         .to_string()
@@ -63,9 +62,8 @@ pub fn part2(input: &str) -> String {
     ops.into_iter()
         .fold((0, true), |(acc, state), val| match val {
             Operation::Mul(x, y) if state => (acc + x * y, true),
-            Operation::Mul(_, _) => (acc, false),
+            Operation::Mul(_, _) | Operation::Dont => (acc, false),
             Operation::Do => (acc, true),
-            Operation::Dont => (acc, false),
         })
         .0
         .to_string()
