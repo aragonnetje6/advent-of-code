@@ -24,15 +24,15 @@ pub fn part1(input: &str) -> String {
         .to_string()
 }
 
-fn count<T: Eq>(x: T, list: &[T]) -> usize {
-    list.iter().filter(|item| **item == x).count()
+fn count<T: Eq>(x: &T, list: &[T]) -> usize {
+    list.iter().filter(|item| *item == x).count()
 }
 
 pub fn part2(input: &str) -> String {
     let (_, (list1, list2)) = parse_file(input).expect("parsing failed");
     list1
         .into_iter()
-        .map(|x| count(x, &list2) * x as usize)
+        .map(|x| count(&x, &list2) * x as usize)
         .sum::<usize>()
         .to_string()
 }
@@ -55,8 +55,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 32.to_string());
+        assert_eq!(part2(DATA1), 31.to_string());
     }
 }
