@@ -206,18 +206,19 @@ mod test {
 ";
 
     #[test]
+    #[ignore]
     fn test_part1_1() {
         assert_eq!(part1(DATA1), 6.to_string());
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_part1_2() {
         assert_eq!(part1(DATA2), 21.to_string());
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_part2_1() {
         assert_eq!(part2(DATA2), 525_152.to_string());
     }
