@@ -1,5 +1,5 @@
 [workspace]
-members = ["ac2021", "ac2022", "ac2023", "lib"]
+members = ["ac2021", "ac2022", "ac2023", "ac2024", "lib"]
 resolver = "2"
 
 [workspace.dependencies]

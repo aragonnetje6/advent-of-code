@@ -1,0 +1,13 @@
+[package]
+name = "ac2024"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lib = { path = "./../lib" }
+nom = { workspace = true }
+itertools = { workspace = true }
+indicatif = { workspace = true }
+nom_locate = "4.2.0"
