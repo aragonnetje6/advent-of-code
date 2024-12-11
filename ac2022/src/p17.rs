@@ -196,7 +196,7 @@ struct Board<'a> {
     blocks_loop: EnumeratedEndless<'static, [[Rock; 7]; 7]>,
 }
 
-impl<'a> Display for Board<'a> {
+impl Display for Board<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
