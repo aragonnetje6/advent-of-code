@@ -33,13 +33,11 @@ enum Operator {
 }
 
 impl Operator {
-    fn eval(self, x: u128, y: u128) -> u128 {
+    const fn eval(self, x: u128, y: u128) -> u128 {
         match self {
             Self::Add => x + y,
             Self::Mul => x * y,
-            Self::Concat => (x.to_string() + &y.to_string())
-                .parse()
-                .expect("number failed to parse?"),
+            Self::Concat => 10u128.pow(1 + y.ilog10()) * x + y,
         }
     }
 }
