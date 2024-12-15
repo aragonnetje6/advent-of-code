@@ -61,4 +61,9 @@ mod test {
     fn test_part1() {
         assert_eq!(part1(DATA1), 55312.to_string());
     }
+
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(DATA1), 65601038650482u64.to_string());
+    }
 }
