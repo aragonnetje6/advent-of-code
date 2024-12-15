@@ -1,66 +1,54 @@
 #![allow(clippy::copy_iterator)]
+use std::collections::HashMap;
+
 use nom::{character::complete, multi::separated_list1, IResult};
 
 fn parse_stones(input: &str) -> IResult<&str, Vec<u64>> {
     separated_list1(complete::space1, complete::u64)(input)
 }
 
-#[derive(Debug, Clone, Copy)]
-enum MaybeSplit {
-    None,
-    One(u64),
-    Two(u64, u64),
-}
-
-impl Iterator for MaybeSplit {
-    type Item = u64;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match *self {
-            Self::One(x) => {
-                *self = Self::None;
-                Some(x)
-            }
-            Self::Two(x, y) => {
-                *self = Self::One(y);
-                Some(x)
-            }
-            Self::None => None,
+fn update_stones(stones: HashMap<u64, u64>) -> HashMap<u64, u64> {
+    let mut result = HashMap::new();
+    for (k, v) in stones {
+        if k == 0 {
+            *result.entry(1).or_default() += v;
+            continue;
+        }
+        let digits = k.ilog10() + 1;
+        if digits % 2 == 0 {
+            *result.entry(k / 10u64.pow(digits / 2)).or_default() += v;
+            *result.entry(k % 10u64.pow(digits / 2)).or_default() += v;
+        } else {
+            *result.entry(k * 2024).or_default() += v;
         }
     }
+    result
 }
 
-fn update_stones(stones: Vec<u64>) -> Vec<u64> {
-    stones
-        .into_iter()
-        .flat_map(|x| {
-            if x == 0 {
-                return MaybeSplit::One(1);
-            }
-            let digits = x.ilog10() + 1;
-            if digits % 2 == 0 {
-                MaybeSplit::Two(x / 10u64.pow(digits / 2), x % 10u64.pow(digits / 2))
-            } else {
-                MaybeSplit::One(x * 2024)
-            }
-        })
-        .collect()
+fn to_amounts(stones: &[u64]) -> HashMap<u64, u64> {
+    let mut amounts = HashMap::new();
+    for stone in stones {
+        *amounts.entry(*stone).or_default() += 1;
+    }
+    amounts
 }
 
 pub fn part1(input: &str) -> String {
-    let (_, mut stones) = parse_stones(input).expect("parsing error");
+    let (_, stones) = parse_stones(input).expect("parsing error");
+    let mut stone_counts = to_amounts(&stones);
     for _ in 0..25 {
-        stones = update_stones(stones);
+        stone_counts = update_stones(stone_counts);
     }
-    stones.len().to_string()
+    stone_counts.values().sum::<u64>().to_string()
 }
 
 pub fn part2(input: &str) -> String {
-    let (_, mut stones) = parse_stones(input).expect("parsing error");
+    let (_, stones) = parse_stones(input).expect("parsing error");
+    let mut stone_counts = to_amounts(&stones);
     for _ in 0..75 {
-        stones = update_stones(stones);
+        stone_counts = update_stones(stone_counts);
     }
-    stones.len().to_string()
+    stone_counts.values().sum::<u64>().to_string()
 }
 
 #[cfg(test)]

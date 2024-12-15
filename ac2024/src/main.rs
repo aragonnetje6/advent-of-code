@@ -37,5 +37,5 @@ fn main() {
     solution!(10, 1);
     solution!(10, 2);
     solution!(11, 1);
-    // solution!(11, 2);
+    solution!(11, 2);
 }
