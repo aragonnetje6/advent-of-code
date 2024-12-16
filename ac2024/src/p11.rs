@@ -64,6 +64,6 @@ mod test {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(DATA1), 65601038650482u64.to_string());
+        assert_eq!(part2(DATA1), 65_601_038_650_482u64.to_string());
     }
 }

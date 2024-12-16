@@ -13,6 +13,7 @@ mod p08;
 mod p09;
 mod p10;
 mod p11;
+mod p12;
 
 #[allow(clippy::zero_prefixed_literal)]
 fn main() {
@@ -38,4 +39,6 @@ fn main() {
     solution!(10, 2);
     solution!(11, 1);
     solution!(11, 2);
+    solution!(12, 1);
+    solution!(12, 2);
 }
