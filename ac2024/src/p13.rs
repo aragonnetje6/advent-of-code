@@ -86,7 +86,6 @@ fn get_optimal_path(machine: Machine) -> Option<(u64, u64)> {
         {
             continue;
         }
-        dbg!(a_count);
         let b_count = remaining_x / button_b.x;
         if let Some((a_old, b_old)) = out {
             if a_count * 3 + b_count < a_old * 3 + b_old {
