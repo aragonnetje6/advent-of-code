@@ -195,6 +195,7 @@ pub fn part2(input: &str) -> String {
             robot.update(101, 103);
         }
         if possible_tree(&robots) {
+            _display(&robots);
             return i.to_string();
         }
     }
