@@ -1,3 +1,4 @@
+#![allow(clippy::match_on_vec_items)]
 use nom::{
     branch::alt,
     character::complete,
@@ -110,13 +111,12 @@ fn do_move(map: &mut [Vec<Tile>], x: usize, y: usize, direction: Move) {
     let (other_x, other_y) = get_obstacle(x, y, direction);
     match map[y][x] {
         Tile::Empty => (),
-        Tile::Wall => unreachable!(),
+        Tile::Wall | Tile::Robot => unreachable!(),
         Tile::Box => {
             do_move(map, other_x, other_y, direction);
             map[other_y][other_x] = map[y][x];
             map[y][x] = Tile::Empty;
         }
-        Tile::Robot => unreachable!(),
         Tile::BoxL => {
             match direction {
                 Move::Up | Move::Down => {
@@ -181,7 +181,7 @@ fn get_gps(map: &[Vec<Tile>]) -> usize {
         .sum::<usize>()
 }
 
-fn display(map: &[Vec<Tile>]) {
+fn _display(map: &[Vec<Tile>]) {
     for line in map {
         println!(
             "{}",

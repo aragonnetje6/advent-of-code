@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use nom::{
     bytes::complete::tag,
     character::complete,
@@ -124,41 +123,17 @@ pub fn part1(input: &str) -> String {
     simulate_robots(input, 101, 103)
 }
 
-fn largest_contingent(robots: &[Robot]) -> Vec<Robot> {
-    let mut mut_robots = robots.to_vec();
-    let mut contingents: Vec<Vec<Robot>> = vec![];
-    while !mut_robots.is_empty() {
-        contingents.push(vec![mut_robots.pop().expect("no robots")]);
-        while let Some((i, _)) = mut_robots.iter().find_position(|robot| {
-            for x in -1..=1 {
-                for y in -1..=1 {
-                    if contingents
-                        .last()
-                        .expect("no contingents")
-                        .iter()
-                        .any(|robot2| robot2.position + Vec2::new(x, y) == robot.position)
-                    {
-                        return true;
-                    }
-                }
-            }
-            false
-        }) {
-            contingents
-                .last_mut()
-                .expect("no contingents")
-                .push(mut_robots.swap_remove(i));
-        }
-    }
-
-    contingents
-        .into_iter()
-        .max_by_key(Vec::len)
-        .expect("no robots")
-}
-
 fn possible_tree(robots: &[Robot]) -> bool {
-    largest_contingent(robots).len() > 200
+    robots
+        .iter()
+        .filter(|robot| {
+            robot.position.x >= 21
+                && robot.position.x <= 51
+                && robot.position.y >= 37
+                && robot.position.y <= 69
+        })
+        .count()
+        >= 250
 }
 
 fn _display(robots: &[Robot]) {
@@ -195,7 +170,6 @@ pub fn part2(input: &str) -> String {
             robot.update(101, 103);
         }
         if possible_tree(&robots) {
-            _display(&robots);
             return i.to_string();
         }
     }
